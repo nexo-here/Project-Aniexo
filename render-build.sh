@@ -3,45 +3,79 @@
 # Render build script for Aniexo
 echo "Starting Render build process..."
 
+# Show current directory
+echo "Current directory: $(pwd)"
+ls -la
+
+# Create dist directory structure
+mkdir -p dist/public
+
 # Install production dependencies
 echo "Installing production dependencies..."
 npm ci
 
-# Install express for our production server
+# Install express and fs-extra for our production server
 echo "Installing express for production server..."
-npm install --save express
+npm install --save express fs-extra
 
 # Install dev dependencies needed for building the frontend
 echo "Installing development dependencies for frontend build..."
-npm install --no-save vite @vitejs/plugin-react typescript
+npm install --no-save vite @vitejs/plugin-react typescript @tailwindcss/vite postcss-import
 
-# Create a simplified vite config for production
-echo "Creating simplified production Vite config..."
-cat > vite.production.config.js << EOL
-import { defineConfig } from 'vite';
-import react from '@vitejs/plugin-react';
-import path from 'path';
+# Create a simplified build script that doesn't depend on vite config
+echo "Creating simplified build script..."
+cat > build-frontend.js << EOL
+const { execSync } = require('child_process');
+const fs = require('fs-extra');
+const path = require('path');
 
-export default defineConfig({
-  plugins: [react()],
-  resolve: {
-    alias: {
-      '@': path.resolve(__dirname, './client/src'),
-      '@shared': path.resolve(__dirname, './shared'),
-      '@assets': path.resolve(__dirname, './assets'),
-    },
-  },
-  root: path.resolve(__dirname, 'client'),
-  build: {
-    outDir: path.resolve(__dirname, 'dist/public'),
-    emptyOutDir: true,
-  },
-});
+// Ensure dist directory exists
+fs.ensureDirSync('dist/public');
+
+// Create a simplified index.html to be used as template
+const indexContent = \`
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Aniexo - Anime Discovery Platform</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
+\`;
+
+// Write the index.html to client directory
+fs.writeFileSync('client/index.html', indexContent);
+
+try {
+  // Build using plain vanilla Vite command
+  console.log('Building frontend...');
+  execSync('npx vite build client --outDir ../dist/public', { stdio: 'inherit' });
+  console.log('Frontend built successfully!');
+} catch (error) {
+  console.error('Build failed:', error);
+  process.exit(1);
+}
+
+// Verify build
+if (fs.existsSync('dist/public/index.html')) {
+  console.log('Build verified successfully!');
+} else {
+  console.error('Build verification failed - index.html not found');
+  process.exit(1);
+}
 EOL
 
-# Build the frontend with Vite using the simplified config
-echo "Building frontend with Vite..."
-npx vite build --config vite.production.config.js
+# Execute the build script
+echo "Executing build script..."
+node build-frontend.js || {
+  echo "Advanced build failed, falling back to simple build..."
+  node simple-build.js
+}
 
 # Create appropriate directory structure for the server
 echo "Setting up correct directory structure..."

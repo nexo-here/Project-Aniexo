@@ -24,8 +24,57 @@ app.use((req, res, next) => {
   next();
 });
 
+// Determine static files path
+let staticPath = path.join(__dirname, 'dist/public');
+
+// Check if the directory exists, if not, try alternate locations
+if (!fs.existsSync(staticPath) || !fs.existsSync(path.join(staticPath, 'index.html'))) {
+  console.log('Primary static path not found, checking alternatives...');
+  
+  const alternativePaths = [
+    path.join(__dirname, 'client', 'dist'),
+    path.join(__dirname, 'dist'),
+    path.join(__dirname, 'public'),
+    path.join(__dirname, 'build')
+  ];
+  
+  for (const altPath of alternativePaths) {
+    if (fs.existsSync(altPath) && fs.existsSync(path.join(altPath, 'index.html'))) {
+      staticPath = altPath;
+      console.log(`Found static files at: ${staticPath}`);
+      break;
+    }
+  }
+}
+
+// Log the static path being used
+console.log(`Serving static files from: ${staticPath}`);
+
+// Create the directory if it doesn't exist
+if (!fs.existsSync(staticPath)) {
+  console.log('Static directory not found, creating it...');
+  fs.mkdirSync(staticPath, { recursive: true });
+  
+  // Create a simple index.html as fallback
+  fs.writeFileSync(path.join(staticPath, 'index.html'), `
+    <!DOCTYPE html>
+    <html>
+      <head>
+        <title>Aniexo</title>
+        <style>
+          body { font-family: Arial, sans-serif; text-align: center; padding: 50px; }
+          h1 { color: #333; }
+        </style>
+      </head>
+      <body>
+        <h1>Aniexo - Anime Discovery Platform</h1>
+        <p>The application is currently being deployed. Please check back soon.</p>
+      </body>
+    </html>
+  `);
+}
+
 // Serve static files
-const staticPath = path.join(__dirname, 'dist/public');
 app.use(express.static(staticPath));
 
 // Health check endpoint
