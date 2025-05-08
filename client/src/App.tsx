@@ -12,6 +12,7 @@ import AnimeDetail from "@/pages/AnimeDetail";
 import Upcoming from "@/pages/Upcoming";
 import Trending from "@/pages/Trending";
 import Underrated from "@/pages/Underrated";
+import Matchmaker from "@/pages/Matchmaker";
 import Login from "@/pages/auth/Login";
 import Register from "@/pages/auth/Register";
 import Favorites from "@/pages/user/Favorites";
@@ -25,6 +26,7 @@ function Router() {
       <Route path="/upcoming" component={Upcoming} />
       <Route path="/trending" component={Trending} />
       <Route path="/underrated" component={Underrated} />
+      <Route path="/matchmaker" component={Matchmaker} />
       <Route path="/login" component={Login} />
       <Route path="/register" component={Register} />
       <Route path="/favorites" component={Favorites} />

@@ -319,6 +319,23 @@ const Home = () => {
           </div>
         </div>
       </section>
+
+      {/* Anime Matchmaker Promo Section */}
+      <section className="py-16 bg-primary/10 dark:bg-primary/5">
+        <div className="container mx-auto px-4 text-center">
+          <h2 className="text-3xl font-bold font-poppins mb-4">Find Your Perfect Anime Match</h2>
+          <p className="text-lg text-gray-600 dark:text-gray-300 mb-8 max-w-2xl mx-auto">
+            Not sure what to watch next? Let our Anime Matchmaker suggest titles based on your mood and preferences!
+          </p>
+          <Link 
+            href="/matchmaker" 
+            className="bg-primary hover:bg-primary-dark text-white py-3 px-8 rounded-lg font-medium inline-flex items-center transition-colors"
+          >
+            <span className="mr-2">Try Anime Matchmaker</span>
+            <i className="fas fa-arrow-right"></i>
+          </Link>
+        </div>
+      </section>
     </>
   );
 };

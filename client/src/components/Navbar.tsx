@@ -78,6 +78,9 @@ const Navbar = () => {
             <Link href="/underrated" className={`font-medium ${location === '/underrated' ? 'text-primary' : 'text-neutral-dark/70 dark:text-white/70'} hover:text-primary dark:hover:text-primary transition-colors`}>
               Underrated
             </Link>
+            <Link href="/matchmaker" className={`font-medium ${location === '/matchmaker' ? 'text-primary' : 'text-neutral-dark/70 dark:text-white/70'} hover:text-primary dark:hover:text-primary transition-colors`}>
+              Matchmaker
+            </Link>
           </div>
           
           {/* Search & User Controls */}
@@ -192,10 +195,17 @@ const Navbar = () => {
             </Link>
             <Link 
               href="/underrated" 
-              className={`font-medium py-2 ${location === '/underrated' ? 'text-primary' : 'text-neutral-dark dark:text-white'}`}
+              className={`font-medium py-2 border-b border-gray-100 dark:border-neutral-dark ${location === '/underrated' ? 'text-primary' : 'text-neutral-dark dark:text-white'}`}
               onClick={() => setMobileMenuOpen(false)}
             >
               Underrated
+            </Link>
+            <Link 
+              href="/matchmaker" 
+              className={`font-medium py-2 ${location === '/matchmaker' ? 'text-primary' : 'text-neutral-dark dark:text-white'}`}
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              Matchmaker
             </Link>
           </div>
         </div>
