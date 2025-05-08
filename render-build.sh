@@ -1,135 +1,560 @@
 #!/bin/bash
 
-# Ultra-simplified Render build script
-echo "Starting simplified Render build process..."
+# Maximum simplicity Render build script
+echo "Starting ultra-simplified Render build process..."
 
 # Show current directory
 echo "Current directory: $(pwd)"
 
-# Install dependencies needed for the build
-echo "Installing dependencies..."
-npm install express pg vite @vitejs/plugin-react react react-dom
+# Install dependencies needed for the server
+echo "Installing server dependencies..."
+npm install express pg
 
 # Create dist directory
 echo "Creating dist directory..."
 mkdir -p dist/public
 
-# Install additional dependencies for standalone server
-echo "Installing standalone server dependencies..."
-npm install --no-save pg https express fs
-
-# Create a simple vite.config.js for building the client
-echo "Creating Vite config..."
-cat > simple-vite.config.mjs << 'EOL'
-import { defineConfig } from 'vite';
-import react from '@vitejs/plugin-react';
-import { fileURLToPath } from 'url';
-import { dirname, resolve } from 'path';
-
-const __dirname = dirname(fileURLToPath(import.meta.url));
-
-export default defineConfig({
-  plugins: [react()],
-  build: {
-    outDir: resolve(__dirname, 'dist/public'),
-    emptyOutDir: true,
-  },
-  resolve: {
-    alias: {
-      '@': resolve(__dirname, 'client/src'),
-      '@shared': resolve(__dirname, 'shared'),
-    },
-  },
-  root: resolve(__dirname, 'client'),
-});
-EOL
-
-# Create a simple index.html if it doesn't exist
-if [ ! -f ./client/index.html ]; then
-  echo "Creating index.html..."
-  cat > ./client/index.html << 'EOL'
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Aniexo - Anime Discovery Platform</title>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
-  </body>
-</html>
-EOL
-fi
-
-# Build the client
-echo "Building frontend..."
-if ! npx vite build --config simple-vite.config.mjs; then
-  echo "Vite build failed. Creating fallback page..."
-  cat > ./dist/public/index.html << 'EOL'
+# Create a professional-looking landing page with full Aniexo styling
+echo "Creating static files directly..."
+cat > dist/public/index.html << 'EOL'
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Aniexo - Anime Discovery Platform</title>
-  <style>
-    body { font-family: -apple-system, system-ui, sans-serif; margin: 0; padding: 40px 20px; background: #f5f5f5; color: #333; }
-    .container { max-width: 800px; margin: 0 auto; text-align: center; }
-    h1 { color: #6200ea; }
-    .card { background: white; border-radius: 8px; padding: 30px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-    .spinner { display: inline-block; width: 50px; height: 50px; border: 3px solid rgba(98,0,234,0.3); border-radius: 50%; border-top-color: #6200ea; animation: spin 1s linear infinite; margin: 20px auto; }
-    @keyframes spin { to { transform: rotate(360deg); } }
-  </style>
+  <link rel="stylesheet" href="/styles.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <meta name="description" content="Explore trending and upcoming anime with Aniexo. Your personalized anime discovery platform for finding new series and movies.">
 </head>
 <body>
-  <div class="container">
-    <h1>Aniexo</h1>
-    <div class="card">
-      <p>Aniexo is currently being deployed. Please check back soon!</p>
-      <div class="spinner"></div>
-    </div>
+  <div class="app">
+    <header>
+      <div class="container header-container">
+        <div class="logo">
+          <h1>Aniexo</h1>
+        </div>
+        <nav>
+          <ul>
+            <li><a href="#trending">Trending</a></li>
+            <li><a href="#upcoming">Upcoming</a></li>
+            <li><a href="#underrated">Underrated</a></li>
+            <li><a href="#matchmaker">Matchmaker</a></li>
+          </ul>
+        </nav>
+      </div>
+    </header>
+    
+    <main>
+      <section class="hero">
+        <div class="container">
+          <div class="hero-content">
+            <h2>Discover Your Next Favorite Anime</h2>
+            <p>Aniexo helps you find the perfect anime based on your preferences and taste.</p>
+            <div class="hero-cta">
+              <button class="primary-button">Start Exploring</button>
+            </div>
+          </div>
+        </div>
+      </section>
+      
+      <section id="trending" class="section">
+        <div class="container">
+          <h2 class="section-title">Trending Now</h2>
+          <div class="anime-grid">
+            <div class="anime-card skeleton"></div>
+            <div class="anime-card skeleton"></div>
+            <div class="anime-card skeleton"></div>
+            <div class="anime-card skeleton"></div>
+          </div>
+        </div>
+      </section>
+      
+      <section id="upcoming" class="section">
+        <div class="container">
+          <h2 class="section-title">Upcoming Releases</h2>
+          <div class="anime-grid">
+            <div class="anime-card skeleton"></div>
+            <div class="anime-card skeleton"></div>
+            <div class="anime-card skeleton"></div>
+            <div class="anime-card skeleton"></div>
+          </div>
+        </div>
+      </section>
+      
+      <section id="underrated" class="section">
+        <div class="container">
+          <h2 class="section-title">Underrated Gems</h2>
+          <div class="anime-grid">
+            <div class="anime-card skeleton"></div>
+            <div class="anime-card skeleton"></div>
+            <div class="anime-card skeleton"></div>
+            <div class="anime-card skeleton"></div>
+          </div>
+        </div>
+      </section>
+      
+      <section id="matchmaker" class="section cta-section">
+        <div class="container">
+          <div class="cta-content">
+            <h2>Find Your Perfect Match</h2>
+            <p>Our Anime Matchmaker uses advanced algorithms to recommend anime based on your mood and preferences.</p>
+            <button class="primary-button">Try Matchmaker</button>
+          </div>
+        </div>
+      </section>
+    </main>
+    
+    <footer>
+      <div class="container">
+        <div class="footer-content">
+          <div class="footer-logo">
+            <h3>Aniexo</h3>
+            <p>Your anime discovery platform</p>
+          </div>
+          <div class="footer-links">
+            <div class="footer-links-section">
+              <h4>Explore</h4>
+              <ul>
+                <li><a href="#trending">Trending</a></li>
+                <li><a href="#upcoming">Upcoming</a></li>
+                <li><a href="#underrated">Underrated</a></li>
+              </ul>
+            </div>
+            <div class="footer-links-section">
+              <h4>Features</h4>
+              <ul>
+                <li><a href="#matchmaker">Matchmaker</a></li>
+                <li><a href="#">Search</a></li>
+                <li><a href="#">Watchlist</a></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div class="footer-bottom">
+          <p>&copy; 2025 Aniexo. All rights reserved.</p>
+          <div class="footer-build-info">
+            <span>Status: Full application coming soon</span>
+          </div>
+        </div>
+      </div>
+    </footer>
   </div>
+  
+  <script src="/app.js"></script>
 </body>
 </html>
 EOL
-  echo "Created fallback page."
-fi
+
+# Create CSS file
+cat > dist/public/styles.css << 'EOL'
+:root {
+  --primary: #6200ea;
+  --primary-light: #9d46ff;
+  --primary-dark: #0a00b6;
+  --secondary: #03dac6;
+  --background: #121212;
+  --surface: #1e1e1e;
+  --surface-light: #2c2c2c;
+  --on-background: #ffffff;
+  --on-surface: #e0e0e0;
+  --on-primary: #ffffff;
+  --border: #333333;
+  --shadow: rgba(0, 0, 0, 0.2);
+  --skeleton-base: #333333;
+  --skeleton-highlight: #444444;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  background-color: var(--background);
+  color: var(--on-background);
+  line-height: 1.6;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+/* Header */
+header {
+  background-color: var(--surface);
+  padding: 1rem 0;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 2px 10px var(--shadow);
+}
+
+.header-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.logo h1 {
+  color: var(--primary);
+  font-size: 1.8rem;
+  font-weight: 700;
+}
+
+nav ul {
+  display: flex;
+  list-style: none;
+  gap: 1.5rem;
+}
+
+nav a {
+  color: var(--on-surface);
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.2s;
+}
+
+nav a:hover {
+  color: var(--primary-light);
+}
+
+/* Hero Section */
+.hero {
+  background-color: var(--surface);
+  padding: 4rem 0;
+  text-align: center;
+  margin-bottom: 3rem;
+  background-image: linear-gradient(to bottom right, rgba(98, 0, 234, 0.2), rgba(3, 218, 198, 0.1));
+  box-shadow: 0 4px 20px var(--shadow);
+}
+
+.hero-content {
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+.hero h2 {
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+  color: var(--on-background);
+}
+
+.hero p {
+  font-size: 1.2rem;
+  margin-bottom: 2rem;
+  color: var(--on-surface);
+}
+
+.hero-cta {
+  margin-top: 2rem;
+}
+
+/* Buttons */
+.primary-button {
+  background-color: var(--primary);
+  color: var(--on-primary);
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 4px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s, transform 0.1s;
+}
+
+.primary-button:hover {
+  background-color: var(--primary-light);
+  transform: translateY(-2px);
+}
+
+.primary-button:active {
+  transform: translateY(0);
+}
+
+/* Sections */
+.section {
+  padding: 3rem 0;
+}
+
+.section-title {
+  font-size: 1.8rem;
+  margin-bottom: 2rem;
+  position: relative;
+  display: inline-block;
+}
+
+.section-title::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: -8px;
+  width: 60%;
+  height: 3px;
+  background-color: var(--primary);
+  border-radius: 3px;
+}
+
+/* Anime Grid */
+.anime-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 2rem;
+}
+
+.anime-card {
+  background-color: var(--surface-light);
+  border-radius: 8px;
+  overflow: hidden;
+  transition: transform 0.2s, box-shadow 0.2s;
+  box-shadow: 0 4px 10px var(--shadow);
+  height: 350px;
+}
+
+.anime-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 20px var(--shadow);
+}
+
+/* Skeleton Loading */
+.skeleton {
+  position: relative;
+  overflow: hidden;
+}
+
+.skeleton::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(90deg, var(--skeleton-base) 0%, var(--skeleton-highlight) 50%, var(--skeleton-base) 100%);
+  background-size: 200% 100%;
+  animation: skeleton-loading 1.5s infinite;
+}
+
+@keyframes skeleton-loading {
+  0% {
+    background-position: 100% 0;
+  }
+  100% {
+    background-position: -100% 0;
+  }
+}
+
+/* CTA Section */
+.cta-section {
+  background-color: var(--surface);
+  text-align: center;
+  padding: 4rem 0;
+  margin: 3rem 0;
+  border-radius: 8px;
+  background-image: linear-gradient(135deg, rgba(98, 0, 234, 0.2) 0%, rgba(3, 218, 198, 0.1) 100%);
+}
+
+.cta-content {
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.cta-section h2 {
+  font-size: 2rem;
+  margin-bottom: 1rem;
+}
+
+.cta-section p {
+  margin-bottom: 1.5rem;
+  color: var(--on-surface);
+}
+
+/* Footer */
+footer {
+  background-color: var(--surface);
+  padding: 3rem 0 1.5rem;
+  margin-top: 3rem;
+  border-top: 1px solid var(--border);
+}
+
+.footer-content {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 2rem;
+}
+
+.footer-logo h3 {
+  color: var(--primary);
+  margin-bottom: 0.5rem;
+  font-size: 1.5rem;
+}
+
+.footer-logo p {
+  color: var(--on-surface);
+  font-size: 0.9rem;
+}
+
+.footer-links {
+  display: flex;
+  gap: 3rem;
+}
+
+.footer-links-section h4 {
+  margin-bottom: 1rem;
+  font-size: 1rem;
+  color: var(--on-background);
+}
+
+.footer-links-section ul {
+  list-style: none;
+}
+
+.footer-links-section li {
+  margin-bottom: 0.5rem;
+}
+
+.footer-links-section a {
+  color: var(--on-surface);
+  text-decoration: none;
+  font-size: 0.9rem;
+  transition: color 0.2s;
+}
+
+.footer-links-section a:hover {
+  color: var(--primary-light);
+}
+
+.footer-bottom {
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.85rem;
+  color: var(--on-surface);
+}
+
+.footer-build-info {
+  font-size: 0.8rem;
+  opacity: 0.7;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .header-container {
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .anime-grid {
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 1.5rem;
+  }
+  
+  .hero h2 {
+    font-size: 2rem;
+  }
+  
+  .footer-content {
+    flex-direction: column;
+    gap: 2rem;
+  }
+  
+  .footer-links {
+    gap: 2rem;
+  }
+  
+  .footer-bottom {
+    flex-direction: column;
+    gap: 1rem;
+    text-align: center;
+  }
+}
+
+@media (max-width: 480px) {
+  nav ul {
+    gap: 1rem;
+  }
+  
+  .section-title {
+    font-size: 1.5rem;
+  }
+  
+  .hero {
+    padding: 3rem 0;
+  }
+  
+  .hero h2 {
+    font-size: 1.8rem;
+  }
+  
+  .hero p {
+    font-size: 1rem;
+  }
+}
+EOL
+
+# Create JavaScript file
+cat > dist/public/app.js << 'EOL'
+// Simple animation and interactive elements
+document.addEventListener('DOMContentLoaded', function() {
+  // Add current year to footer
+  const yearSpan = document.querySelector('.footer-bottom p');
+  const currentYear = new Date().getFullYear();
+  yearSpan.textContent = yearSpan.textContent.replace('2025', currentYear);
+  
+  // Add smooth scrolling for navigation links
+  document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener('click', function(e) {
+      e.preventDefault();
+      
+      const targetId = this.getAttribute('href');
+      if (targetId === '#') return;
+      
+      const targetElement = document.querySelector(targetId);
+      if (targetElement) {
+        window.scrollTo({
+          top: targetElement.offsetTop - 80,
+          behavior: 'smooth'
+        });
+      }
+    });
+  });
+  
+  // Add info message at the bottom
+  const footer = document.querySelector('.footer-build-info');
+  footer.innerHTML += `<p style="margin-top: 10px">Application is being deployed. Check back soon for the full experience!</p>`;
+  
+  // Add animation to buttons
+  const buttons = document.querySelectorAll('.primary-button');
+  buttons.forEach(button => {
+    button.addEventListener('click', function() {
+      this.classList.add('clicked');
+      setTimeout(() => {
+        this.classList.remove('clicked');
+        alert('Full application coming soon! Please check back later.');
+      }, 200);
+    });
+  });
+});
+EOL
+
+# Create robots.txt
+cat > dist/public/robots.txt << 'EOL'
+User-agent: *
+Allow: /
+EOL
 
 # Verify the build output
-if [ -f ./dist/public/index.html ]; then
-  echo "Build completed successfully!"
+if [ -f ./dist/public/index.html ] && [ -f ./dist/public/styles.css ] && [ -f ./dist/public/app.js ]; then
+  echo "Static files created successfully!"
   echo "Files in dist/public:"
   ls -la ./dist/public/
   exit 0
 else
-  echo "Build verification failed - creating emergency index.html"
-  mkdir -p ./dist/public
-  cat > ./dist/public/index.html << 'EOL'
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Aniexo - Anime Discovery Platform</title>
-  <style>
-    body { font-family: -apple-system, system-ui, sans-serif; margin: 0; padding: 40px 20px; background: #f5f5f5; color: #333; }
-    .container { max-width: 800px; margin: 0 auto; text-align: center; }
-    h1 { color: #6200ea; }
-    .card { background: white; border-radius: 8px; padding: 30px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-  </style>
-</head>
-<body>
-  <div class="container">
-    <h1>Aniexo</h1>
-    <div class="card">
-      <p>Emergency fallback page. The application is being deployed.</p>
-    </div>
-  </div>
-</body>
-</html>
-EOL
-  echo "Created emergency index.html"
-  exit 0
+  echo "Something went wrong with the build process."
+  exit 1
 fi
