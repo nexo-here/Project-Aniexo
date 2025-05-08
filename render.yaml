@@ -14,8 +14,16 @@ services:
         fromDatabase:
           name: aniexo-db
           property: connectionString
-      - fromGroup: aniexo-secrets
 
 databases:
   - name: aniexo-db
     plan: free
+
+# Define environment variable groups - uncomment and customize if needed
+# envVarGroups:
+#   - name: aniexo-secrets
+#     envVars:
+#       - key: JIKAN_API_KEY
+#         value: your-jikan-api-key
+#       - key: OPENAI_API_KEY
+#         sync: false
