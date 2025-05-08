@@ -26,8 +26,8 @@ else
   echo "React application build failed, creating fallback landing page..."
   
   # Create a professional-looking landing page with full Aniexo styling
-echo "Creating static files directly..."
-cat > dist/public/index.html << 'EOL'
+  echo "Creating static files directly..."
+  cat > dist/public/index.html << 'EOL'
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -157,8 +157,8 @@ cat > dist/public/index.html << 'EOL'
 </html>
 EOL
 
-# Create CSS file
-cat > dist/public/styles.css << 'EOL'
+  # Create CSS file
+  cat > dist/public/styles.css << 'EOL'
 :root {
   --primary: #6200ea;
   --primary-light: #9d46ff;
@@ -506,10 +506,64 @@ footer {
     font-size: 1rem;
   }
 }
+
+/* Anime Card Styles */
+.anime-card {
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  height: 340px;
+  overflow: hidden;
+}
+
+.anime-card-image {
+  width: 100%;
+  height: 240px;
+  background-size: cover;
+  background-position: center;
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+  transition: transform 0.3s ease;
+}
+
+.anime-card:hover .anime-card-image {
+  transform: scale(1.05);
+}
+
+.anime-card-content {
+  padding: 0.8rem;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--surface-light);
+}
+
+.anime-card-content h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  line-height: 1.3;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.anime-card-score {
+  margin-top: auto;
+  color: #ffcc00;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.anime-card.skeleton {
+  background-color: transparent;
+}
 EOL
 
-# Create JavaScript file
-cat > dist/public/app.js << 'EOL'
+  # Create JavaScript file
+  cat > dist/public/app.js << 'EOL'
 // Enhanced app.js with dynamic content loading from API
 document.addEventListener('DOMContentLoaded', function() {
   // Add current year to footer
@@ -644,11 +698,13 @@ function displayAnime(sectionId, animeList) {
 }
 EOL
 
-# Create robots.txt
-cat > dist/public/robots.txt << 'EOL'
+  # Create robots.txt
+  cat > dist/public/robots.txt << 'EOL'
 User-agent: *
 Allow: /
 EOL
+
+fi
 
 # Verify the build output
 if [ -f ./dist/public/index.html ] && [ -f ./dist/public/styles.css ] && [ -f ./dist/public/app.js ]; then
