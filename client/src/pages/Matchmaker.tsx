@@ -53,7 +53,7 @@ const Matchmaker = () => {
       "/api/recommendations",
       {
         mood: selectedMood,
-        genres: selectedGenre ? [selectedGenre] : undefined,
+        genres: selectedGenre && selectedGenre !== "any" ? [selectedGenre] : undefined,
         user_id: isAuthenticated ? user?.id : undefined,
       },
     ],
@@ -117,7 +117,7 @@ const Matchmaker = () => {
                   <SelectValue placeholder="Select a genre (optional)" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">Any genre</SelectItem>
+                  <SelectItem value="any">Any genre</SelectItem>
                   {genres?.map((genre) => (
                     <SelectItem key={genre.id} value={genre.name}>
                       {genre.name}

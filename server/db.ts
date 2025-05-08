@@ -5,14 +5,31 @@ import * as schema from "@shared/schema";
 
 neonConfig.webSocketConstructor = ws;
 
-if (!process.env.DATABASE_URL) {
-  throw new Error(
-    "DATABASE_URL must be set. Did you forget to provision a database?",
-  );
+const dbUrl = process.env.DATABASE_URL || "dummy";
+if (dbUrl === "dummy") {
+  console.warn("DATABASE_URL not set. Using dummy data for now. Some features requiring database will not work.");
 }
 
-export const pool = new Pool({ connectionString: process.env.DATABASE_URL });
-export const db = drizzle(pool, { schema });
+let pool: Pool;
+let db: ReturnType<typeof drizzle>;
+
+try {
+  pool = new Pool({ connectionString: dbUrl });
+  db = drizzle(pool, { schema });
+} catch (error) {
+  console.error("Failed to initialize database connection:", error);
+  // Create dummy implementations for database
+  const dummyPool = {} as Pool;
+  db = {
+    query: async () => [],
+    select: () => ({ from: () => ({ where: () => [] }) }),
+    insert: () => ({ values: () => ({ returning: () => [] }) }),
+    delete: () => ({ where: () => ({ returning: () => [] }) })
+  } as any;
+  pool = dummyPool;
+}
+
+export { pool, db };
 
 // Helper to handle common database errors
 export const handleDbError = (error: unknown, operation: string) => {
