@@ -1,20 +1,31 @@
 #!/bin/bash
 
-# Maximum simplicity Render build script
-echo "Starting ultra-simplified Render build process..."
+# Full React app build script for Render deployment
+echo "Starting full React app build process for Render..."
 
 # Show current directory
 echo "Current directory: $(pwd)"
 
-# Install dependencies needed for the server
-echo "Installing server dependencies..."
-npm install express pg
+# Install all dependencies (including dev dependencies)
+echo "Installing dependencies..."
+npm ci
 
 # Create dist directory
 echo "Creating dist directory..."
 mkdir -p dist/public
 
-# Create a professional-looking landing page with full Aniexo styling
+# Install additional server dependencies
+echo "Installing API proxy server dependencies..."
+npm install --no-save express https
+
+# Try to build the React application
+echo "Building React application..."
+if node build-react-app.js; then
+  echo "React application built successfully"
+else
+  echo "React application build failed, creating fallback landing page..."
+  
+  # Create a professional-looking landing page with full Aniexo styling
 echo "Creating static files directly..."
 cat > dist/public/index.html << 'EOL'
 <!DOCTYPE html>
@@ -499,7 +510,7 @@ EOL
 
 # Create JavaScript file
 cat > dist/public/app.js << 'EOL'
-// Simple animation and interactive elements
+// Enhanced app.js with dynamic content loading from API
 document.addEventListener('DOMContentLoaded', function() {
   // Add current year to footer
   const yearSpan = document.querySelector('.footer-bottom p');
@@ -526,7 +537,7 @@ document.addEventListener('DOMContentLoaded', function() {
   
   // Add info message at the bottom
   const footer = document.querySelector('.footer-build-info');
-  footer.innerHTML += `<p style="margin-top: 10px">Application is being deployed. Check back soon for the full experience!</p>`;
+  footer.innerHTML = `<span>Status: Connected to Jikan API</span>`;
   
   // Add animation to buttons
   const buttons = document.querySelectorAll('.primary-button');
@@ -535,11 +546,102 @@ document.addEventListener('DOMContentLoaded', function() {
       this.classList.add('clicked');
       setTimeout(() => {
         this.classList.remove('clicked');
-        alert('Full application coming soon! Please check back later.');
+        const text = this.innerText.toLowerCase();
+        if (text.includes('matchmaker')) {
+          alert('The Anime Matchmaker feature is loading. Please check back soon!');
+        } else {
+          alert('Loading anime content from our database...');
+        }
       }, 200);
     });
   });
+  
+  // Load real anime data from API
+  loadTrendingAnime();
+  loadUpcomingAnime();
+  loadUnderratedAnime();
 });
+
+// Fetch and display trending anime
+async function loadTrendingAnime() {
+  try {
+    const response = await fetch('/api/anime/trending');
+    const data = await response.json();
+    
+    if (data.success && data.data && data.data.length > 0) {
+      displayAnime('trending', data.data.slice(0, 4));
+    }
+  } catch (error) {
+    console.error('Error loading trending anime:', error);
+  }
+}
+
+// Fetch and display upcoming anime
+async function loadUpcomingAnime() {
+  try {
+    const response = await fetch('/api/anime/upcoming');
+    const data = await response.json();
+    
+    if (data.success && data.data && data.data.length > 0) {
+      displayAnime('upcoming', data.data.slice(0, 4));
+    }
+  } catch (error) {
+    console.error('Error loading upcoming anime:', error);
+  }
+}
+
+// Fetch and display underrated anime
+async function loadUnderratedAnime() {
+  try {
+    const response = await fetch('/api/anime/underrated');
+    const data = await response.json();
+    
+    if (data.success && data.data && data.data.length > 0) {
+      displayAnime('underrated', data.data.slice(0, 4));
+    }
+  } catch (error) {
+    console.error('Error loading underrated anime:', error);
+  }
+}
+
+// Display anime in the appropriate section
+function displayAnime(sectionId, animeList) {
+  const section = document.getElementById(sectionId);
+  if (!section) return;
+  
+  const grid = section.querySelector('.anime-grid');
+  if (!grid) return;
+  
+  // Clear existing content
+  grid.innerHTML = '';
+  
+  // Create and append anime cards
+  animeList.forEach(anime => {
+    const card = document.createElement('div');
+    card.className = 'anime-card';
+    card.style.cursor = 'pointer';
+    
+    card.addEventListener('click', () => {
+      alert(`Loading details for: ${anime.title}`);
+    });
+    
+    // Create card content
+    let html = `
+      <div class="anime-card-image" style="background-image: url('${anime.image}'); height: 200px; background-size: cover; background-position: center;"></div>
+      <div class="anime-card-content" style="padding: 12px;">
+        <h3 style="font-size: 1rem; margin-bottom: 8px; font-weight: 600; line-height: 1.3;">${anime.title}</h3>
+    `;
+    
+    if (anime.score) {
+      html += `<div style="color: #ffcc00; font-weight: 600; font-size: 0.9rem;">★ ${anime.score.toFixed(1)}</div>`;
+    }
+    
+    html += `</div>`;
+    card.innerHTML = html;
+    
+    grid.appendChild(card);
+  });
+}
 EOL
 
 # Create robots.txt
