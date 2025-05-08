@@ -3,17 +3,45 @@
 # Render build script for Aniexo
 echo "Starting Render build process..."
 
-# Install dev dependencies - needed for build tools
-echo "Installing dependencies with dev packages included..."
-npm ci --include=dev
+# Install production dependencies
+echo "Installing production dependencies..."
+npm ci
 
-# Install http-proxy for the proxy server if not already installed
+# Install dev dependencies separately to guarantee they're installed
+echo "Installing development dependencies..."
+npm install --no-save vite @vitejs/plugin-react esbuild typescript @replit/vite-plugin-runtime-error-modal
+
+# Install proxy dependencies if not already installed
 echo "Installing proxy dependencies..."
 npm install --save express http-proxy child_process
 
-# Build the frontend with Vite
+# Create a simplified vite config for production
+echo "Creating simplified production Vite config..."
+cat > vite.production.config.js << EOL
+import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
+import path from 'path';
+
+export default defineConfig({
+  plugins: [react()],
+  resolve: {
+    alias: {
+      '@': path.resolve(__dirname, './client/src'),
+      '@shared': path.resolve(__dirname, './shared'),
+      '@assets': path.resolve(__dirname, './assets'),
+    },
+  },
+  root: path.resolve(__dirname, 'client'),
+  build: {
+    outDir: path.resolve(__dirname, 'dist/public'),
+    emptyOutDir: true,
+  },
+});
+EOL
+
+# Build the frontend with Vite using the simplified config
 echo "Building frontend with Vite..."
-npx vite build 
+npx vite build --config vite.production.config.js
 
 # Build the backend with esbuild
 echo "Building backend with esbuild..."
