@@ -27,28 +27,8 @@ const Underrated = () => {
         
         {isLoading ? (
           <div className="grid grid-cols-1 gap-6">
-            {Array(8).fill(0).map((_, index) => (
-              <div key={index} className="animate-pulse flex bg-white dark:bg-neutral-medium rounded-xl overflow-hidden shadow-md">
-                <div className="w-1/3 bg-gray-300 dark:bg-gray-700"></div>
-                <div className="w-2/3 p-5">
-                  <div className="flex justify-between">
-                    <div className="h-5 bg-gray-300 dark:bg-gray-700 rounded w-1/2 mb-3"></div>
-                    <div className="h-6 bg-gray-300 dark:bg-gray-700 rounded w-12"></div>
-                  </div>
-                  <div className="flex space-x-2 mb-3">
-                    <div className="h-6 bg-gray-300 dark:bg-gray-700 rounded w-16"></div>
-                    <div className="h-6 bg-gray-300 dark:bg-gray-700 rounded w-16"></div>
-                    <div className="h-6 bg-gray-300 dark:bg-gray-700 rounded w-16"></div>
-                  </div>
-                  <div className="h-4 bg-gray-300 dark:bg-gray-700 rounded w-full mb-2"></div>
-                  <div className="h-4 bg-gray-300 dark:bg-gray-700 rounded w-11/12 mb-2"></div>
-                  <div className="h-4 bg-gray-300 dark:bg-gray-700 rounded w-10/12 mb-3"></div>
-                  <div className="flex">
-                    <div className="h-4 bg-gray-300 dark:bg-gray-700 rounded w-16 mr-3"></div>
-                    <div className="h-4 bg-gray-300 dark:bg-gray-700 rounded w-24"></div>
-                  </div>
-                </div>
-              </div>
+            {[...Array(8)].map((_, index) => (
+              <AnimeCardSkeleton key={`underrated-page-skeleton-${index}`} size="large" />
             ))}
           </div>
         ) : underratedAnime && underratedAnime.length > 0 ? (

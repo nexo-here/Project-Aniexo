@@ -18,23 +18,41 @@ const Home = () => {
     retryDelay: (attempt) => Math.min(attempt > 1 ? 2 ** attempt * 1000 : 1000, 30000)
   });
   
-  const { data: trendingAnime, isLoading: loadingTrending, error: trendingError } = useQuery<AnimeBasic[]>({
+  const { data: trendingAnimeData, isLoading: loadingTrending, error: trendingError } = useQuery<AnimeBasic[]>({
     queryKey: ['/api/anime/trending'],
     retry: 3,
     retryDelay: (attempt) => Math.min(attempt > 1 ? 2 ** attempt * 1000 : 1000, 30000)
   });
   
-  const { data: upcomingAnime, isLoading: loadingUpcoming, error: upcomingError } = useQuery<AnimeBasic[]>({
+  // Create a local array with unique identifiers for trending anime
+  const trendingAnime = trendingAnimeData?.map(anime => ({
+    ...anime,
+    uniqueKey: `trending-${anime.id}`
+  }));
+  
+  const { data: upcomingAnimeData, isLoading: loadingUpcoming, error: upcomingError } = useQuery<AnimeBasic[]>({
     queryKey: ['/api/anime/upcoming'],
     retry: 3,
     retryDelay: (attempt) => Math.min(attempt > 1 ? 2 ** attempt * 1000 : 1000, 30000)
   });
   
-  const { data: underratedAnime, isLoading: loadingUnderrated, error: underratedError } = useQuery<AnimeBasic[]>({
+  // Create a local array with unique identifiers to prevent React key conflicts
+  const upcomingAnime = upcomingAnimeData?.map(anime => ({
+    ...anime,
+    uniqueKey: `upcoming-${anime.id}`
+  }));
+  
+  const { data: underratedAnimeData, isLoading: loadingUnderrated, error: underratedError } = useQuery<AnimeBasic[]>({
     queryKey: ['/api/anime/underrated'],
     retry: 3,
     retryDelay: (attempt) => Math.min(attempt > 1 ? 2 ** attempt * 1000 : 1000, 30000)
   });
+  
+  // Create a local array with unique identifiers for underrated anime
+  const underratedAnime = underratedAnimeData?.map(anime => ({
+    ...anime,
+    uniqueKey: `underrated-${anime.id}`
+  }));
   
   const { data: newsItems, isLoading: loadingNews, error: newsError } = useQuery<NewsItem[]>({
     queryKey: ['/api/anime/news'],
@@ -226,7 +244,7 @@ const Home = () => {
               <div className="carousel flex overflow-x-auto pb-6 -mx-4 px-4 space-x-4 custom-scrollbar">
                 {upcomingAnime && upcomingAnime.length > 0 ? (
                   upcomingAnime.map((anime) => (
-                    <AnimeCardSmall key={anime.id} anime={anime} />
+                    <AnimeCardSmall key={anime.uniqueKey || `upcoming-${anime.id}`} anime={anime} />
                   ))
                 ) : (
                   <div className="w-full text-center py-8">
@@ -263,7 +281,7 @@ const Home = () => {
               ))
             ) : trendingAnime && trendingAnime.length > 0 ? (
               trendingAnime.slice(0, 10).map((anime) => (
-                <AnimeCard key={anime.id} anime={anime} />
+                <AnimeCard key={anime.uniqueKey || `trending-${anime.id}`} anime={anime} />
               ))
             ) : (
               <div className="col-span-2 md:col-span-3 lg:col-span-5 text-center py-8">
@@ -291,7 +309,7 @@ const Home = () => {
               ))
             ) : underratedAnime && underratedAnime.length > 0 ? (
               underratedAnime.slice(0, 4).map((anime) => (
-                <AnimeCardLarge key={anime.id} anime={anime} />
+                <AnimeCardLarge key={anime.uniqueKey || `underrated-${anime.id}`} anime={anime} />
               ))
             ) : (
               <div className="col-span-1 lg:col-span-2 text-center py-8">
