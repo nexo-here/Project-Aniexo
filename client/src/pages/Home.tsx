@@ -25,9 +25,9 @@ const Home = () => {
   });
   
   // Create a local array with unique identifiers for trending anime
-  const trendingAnime = trendingAnimeData?.map(anime => ({
+  const trendingAnime = trendingAnimeData?.map((anime, index) => ({
     ...anime,
-    uniqueKey: `trending-${anime.id}`
+    uniqueKey: `trending-section-${anime.id}-${index}`
   }));
   
   const { data: upcomingAnimeData, isLoading: loadingUpcoming, error: upcomingError } = useQuery<AnimeBasic[]>({
@@ -37,9 +37,9 @@ const Home = () => {
   });
   
   // Create a local array with unique identifiers to prevent React key conflicts
-  const upcomingAnime = upcomingAnimeData?.map(anime => ({
+  const upcomingAnime = upcomingAnimeData?.map((anime, index) => ({
     ...anime,
-    uniqueKey: `upcoming-${anime.id}`
+    uniqueKey: `upcoming-section-${anime.id}-${index}`
   }));
   
   const { data: underratedAnimeData, isLoading: loadingUnderrated, error: underratedError } = useQuery<AnimeBasic[]>({
@@ -49,9 +49,9 @@ const Home = () => {
   });
   
   // Create a local array with unique identifiers for underrated anime
-  const underratedAnime = underratedAnimeData?.map(anime => ({
+  const underratedAnime = underratedAnimeData?.map((anime, index) => ({
     ...anime,
-    uniqueKey: `underrated-${anime.id}`
+    uniqueKey: `underrated-section-${anime.id}-${index}`
   }));
   
   const { data: newsItems, isLoading: loadingNews, error: newsError } = useQuery<NewsItem[]>({
@@ -244,7 +244,7 @@ const Home = () => {
               <div className="carousel flex overflow-x-auto pb-6 -mx-4 px-4 space-x-4 custom-scrollbar">
                 {upcomingAnime && upcomingAnime.length > 0 ? (
                   upcomingAnime.map((anime) => (
-                    <AnimeCardSmall key={anime.uniqueKey || `upcoming-${anime.id}`} anime={anime} />
+                    <AnimeCardSmall key={anime.uniqueKey} anime={anime} />
                   ))
                 ) : (
                   <div className="w-full text-center py-8">
@@ -281,7 +281,7 @@ const Home = () => {
               ))
             ) : trendingAnime && trendingAnime.length > 0 ? (
               trendingAnime.slice(0, 10).map((anime) => (
-                <AnimeCard key={anime.uniqueKey || `trending-${anime.id}`} anime={anime} />
+                <AnimeCard key={anime.uniqueKey} anime={anime} />
               ))
             ) : (
               <div className="col-span-2 md:col-span-3 lg:col-span-5 text-center py-8">
@@ -309,7 +309,7 @@ const Home = () => {
               ))
             ) : underratedAnime && underratedAnime.length > 0 ? (
               underratedAnime.slice(0, 4).map((anime) => (
-                <AnimeCardLarge key={anime.uniqueKey || `underrated-${anime.id}`} anime={anime} />
+                <AnimeCardLarge key={anime.uniqueKey} anime={anime} />
               ))
             ) : (
               <div className="col-span-1 lg:col-span-2 text-center py-8">

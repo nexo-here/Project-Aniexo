@@ -10,9 +10,9 @@ const Trending = () => {
   });
   
   // Create a local array with unique identifiers to prevent React key conflicts
-  const trendingAnime = trendingAnimeData?.map(anime => ({
+  const trendingAnime = trendingAnimeData?.map((anime, index) => ({
     ...anime,
-    uniqueKey: `trending-page-${anime.id}`
+    uniqueKey: `trending-page-${anime.id}-${index}`
   }));
   
   // Set page title
@@ -40,7 +40,7 @@ const Trending = () => {
         ) : trendingAnime && trendingAnime.length > 0 ? (
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-5">
             {trendingAnime.map((anime) => (
-              <AnimeCard key={anime.uniqueKey || `trending-page-${anime.id}`} anime={anime} />
+              <AnimeCard key={anime.uniqueKey} anime={anime} />
             ))}
           </div>
         ) : (
