@@ -12,38 +12,68 @@ import { fileURLToPath } from 'url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
-console.log('\n🚀 Starting Aniexo Deployment Process 🚀\n');
-
-// Step 1: Build the project
-console.log('📦 Building the project...');
-try {
-  execSync('npm run build', { stdio: 'inherit' });
-  console.log('✅ Build completed successfully!\n');
-} catch (err) {
-  console.error('❌ Build failed:', err);
-  process.exit(1);
+function log(message) {
+  console.log(`[Deploy] ${message}`);
 }
 
-// Step 2: Check if the build files exist
-const distDir = path.join(__dirname, 'dist');
-const publicDir = path.join(distDir, 'public');
-const indexJsPath = path.join(distDir, 'index.js');
+function checkPrerequisites() {
+  log('Checking prerequisites...');
+  
+  // Check if the build script exists
+  const buildScriptPath = path.join(__dirname, 'build-for-deployment.js');
+  if (!fs.existsSync(buildScriptPath)) {
+    log('ERROR: build-for-deployment.js script is missing');
+    return false;
+  }
 
-if (!fs.existsSync(publicDir) || !fs.existsSync(indexJsPath)) {
-  console.error('❌ Expected build files not found. Make sure the build process completed correctly.');
-  process.exit(1);
+  // Check if render.yaml exists
+  const renderYamlPath = path.join(__dirname, 'render.yaml');
+  if (!fs.existsSync(renderYamlPath)) {
+    log('ERROR: render.yaml configuration file is missing');
+    return false;
+  }
+
+  log('All prerequisites are met!');
+  return true;
 }
 
-// Step 3: Provide deployment instructions
-console.log('🎉 Build successful! Your project is now ready for deployment.\n');
-console.log('📝 Deployment Instructions:');
-console.log('1. To start the application in production mode, run:');
-console.log('   npm start');
-console.log('2. The application will be available at:');
-console.log('   http://localhost:5000');
-console.log('\n3. For deployment on platforms like Heroku, Vercel, or Repl.it:');
-console.log('   - Ensure the start script is set to "npm start" in your platform config');
-console.log('   - Make sure to set the NODE_ENV environment variable to "production"');
-console.log('\n4. For database connections:');
-console.log('   - Ensure your DATABASE_URL environment variable is properly set in production');
-console.log('\n🛠 Happy coding! 🛠\n');
+function printDeploymentInstructions() {
+  log('\n=====================================================');
+  log('DEPLOYMENT INSTRUCTIONS FOR ANIEXO');
+  log('=====================================================');
+  log('\n1. Build the application for production:');
+  log('   $ node build-for-deployment.js');
+  log('\n2. Deploy to Render:');
+  log('   - Push your code to a Git repository (GitHub, GitLab, etc.)');
+  log('   - Log in to your Render account: https://dashboard.render.com/');
+  log('   - Click "New+" and select "Blueprint"');
+  log('   - Connect your Git repository');
+  log('   - Render will detect the render.yaml file and set up your services');
+  log('\n3. Environment Variables to Set in Render:');
+  log('   - NODE_ENV: production');
+  log('   - DATABASE_URL: (Will be automatically set if using Render\'s database)');
+  log('\n4. Important Notes:');
+  log('   - The application will be built using the scripts in package.json');
+  log('   - The database will be automatically provisioned if using Render\'s database');
+  log('   - The application will be served on port 8080 or the PORT environment variable');
+  log('\n=====================================================');
+  log('For more information, visit: https://render.com/docs/deploy-node-express-app');
+  log('=====================================================\n');
+}
+
+async function main() {
+  log('Starting Aniexo deployment guide...');
+
+  // Check prerequisites
+  if (!checkPrerequisites()) {
+    process.exit(1);
+  }
+
+  // Print deployment instructions
+  printDeploymentInstructions();
+}
+
+main().catch(error => {
+  console.error('Error:', error);
+  process.exit(1);
+});
