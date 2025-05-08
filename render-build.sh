@@ -7,6 +7,10 @@ echo "Starting Render build process..."
 echo "Installing dependencies with dev packages included..."
 npm ci --include=dev
 
+# Install http-proxy for the proxy server if not already installed
+echo "Installing proxy dependencies..."
+npm install --save express http-proxy child_process
+
 # Build the frontend with Vite
 echo "Building frontend with Vite..."
 npx vite build 
@@ -24,6 +28,10 @@ if [ -d ./dist/client ] && [ -f ./dist/client/index.html ]; then
   echo "Moving frontend build to proper location..."
   cp -r ./dist/client/* ./dist/public/
 fi
+
+# Copy port patch file to root directory
+echo "Copying port patch file..."
+cp port-patch.js ./port-patch.js
 
 # Verify the build output
 if [ -f ./dist/index.js ]; then
