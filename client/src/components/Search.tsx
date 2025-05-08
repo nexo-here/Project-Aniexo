@@ -103,16 +103,16 @@ const Search = ({ onClose }: SearchProps) => {
             placeholder="Search anime by title, genre, studio..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-neutral-dark text-gray-900 dark:text-white placeholder:text-gray-500 dark:placeholder:text-gray-400 focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all"
+            className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-neutral-dark text-gray-800 dark:text-white placeholder:text-gray-500 dark:placeholder:text-gray-400 focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all"
           />
           <button 
             className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 dark:text-gray-400 hover:text-primary dark:hover:text-primary transition-colors"
             onClick={() => setSearchTerm("")}
           >
             {searchTerm ? (
-              <i className="fas fa-times"></i>
+              <span>✕</span>
             ) : (
-              <i className="fas fa-search"></i>
+              <span>🔍</span>
             )}
           </button>
         </div>
@@ -145,7 +145,7 @@ const Search = ({ onClose }: SearchProps) => {
                     key={anime.id} 
                     href={`/anime/${anime.id}`}
                     onClick={onClose}
-                    className="anime-card rounded-lg overflow-hidden shadow-md bg-white dark:bg-neutral-medium hover:shadow-lg transition-shadow text-gray-900 dark:text-white"
+                    className="anime-card rounded-lg overflow-hidden shadow-md bg-white dark:bg-neutral-medium hover:shadow-lg transition-shadow"
                   >
                     <div className="relative">
                       <img 
@@ -157,15 +157,20 @@ const Search = ({ onClose }: SearchProps) => {
                       />
                       {anime.score && (
                         <div className="absolute top-2 right-2 bg-black/70 backdrop-blur-sm text-white px-2 py-1 rounded text-xs font-medium flex items-center">
-                          <i className="fas fa-star text-yellow-400 mr-1"></i> {anime.score.toFixed(1)}
+                          <span className="text-yellow-400 mr-1">★</span> {anime.score.toFixed(1)}
                         </div>
                       )}
                     </div>
                     <div className="p-2">
-                      <h3 className="font-montserrat font-semibold text-sm truncate">{anime.title}</h3>
+                      <h3 className="font-semibold text-sm text-gray-900 dark:text-white truncate">{anime.title}</h3>
+                      <p className="text-xs text-gray-700 dark:text-gray-300 mt-1 line-clamp-2 h-8">
+                        {anime.type && <span className="mr-1">{anime.type}</span>}
+                        {anime.episodes && <span className="mr-1">• {anime.episodes} eps</span>}
+                        {anime.season && anime.year && <span>• {anime.season} {anime.year}</span>}
+                      </p>
                       {anime.genres && anime.genres.length > 0 && (
-                        <div className="mt-1 text-xs text-gray-600 dark:text-gray-300">
-                          <span className="bg-gray-200 dark:bg-neutral-dark rounded-full px-2 py-0.5 truncate">
+                        <div className="mt-1 text-xs">
+                          <span className="bg-gray-200 dark:bg-neutral-dark rounded-full px-2 py-0.5 text-gray-800 dark:text-gray-300 truncate">
                             {anime.genres[0]}
                           </span>
                         </div>
@@ -174,8 +179,21 @@ const Search = ({ onClose }: SearchProps) => {
                   </Link>
                 ))}
               </div>
+            ) : error ? (
+              <div className="text-center py-8">
+                <div className="text-red-500 mb-2">Error loading search results</div>
+                <button 
+                  onClick={() => window.location.reload()}
+                  className="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary/90 transition-colors"
+                >
+                  Try again
+                </button>
+              </div>
             ) : (
-              <p className="text-center py-4 text-gray-700 dark:text-gray-300">No results found. Try a different search term or genre.</p>
+              <div className="text-center py-8 text-gray-700 dark:text-gray-300">
+                <p className="text-lg mb-2">No results found</p>
+                <p className="text-sm">Try a different search term or genre</p>
+              </div>
             )}
           </div>
         )}

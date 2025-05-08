@@ -328,71 +328,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/anime/:id", async (req, res) => {
-    try {
-      const id = parseInt(req.params.id);
-      if (isNaN(id)) {
-        return res.status(400).json({
-          success: false,
-          error: "Invalid anime ID"
-        });
-      }
-
-      const cacheKey = `anime_${id}`;
-      const cachedData = cache.get(cacheKey);
-      
-      if (cachedData) {
-        return res.json({
-          success: true,
-          data: cachedData
-        });
-      }
-      
-      const data = await jikanApi.getAnimeById(id);
-      cache.set(cacheKey, data);
-      
-      // If user is authenticated, add this to their watch history
-      if ((req as any).user?.id) {
-        try {
-          await storage.addToHistory({
-            user_id: (req as any).user.id,
-            anime_id: id,
-            anime_title: data.title,
-          });
-        } catch (err) {
-          // Just log the error, don't fail the request
-          console.error("Error adding to watch history:", err);
-        }
-      } else {
-        // Backward compatibility for query param
-        const userId = parseInt(req.query.user_id as string);
-        if (userId && !isNaN(userId)) {
-          try {
-            await storage.addToHistory({
-              user_id: userId,
-              anime_id: id,
-              anime_title: data.title,
-            });
-          } catch (err) {
-            // Just log the error, don't fail the request
-            console.error("Error adding to watch history:", err);
-          }
-        }
-      }
-      
-      res.json({
-        success: true,
-        data
-      });
-    } catch (error) {
-      console.error(`Error fetching anime with ID ${req.params.id}:`, error);
-      res.status(500).json({
-        success: false,
-        error: `Failed to fetch anime with ID ${req.params.id}`
-      });
-    }
-  });
-
   app.get("/api/anime/search", async (req, res) => {
     try {
       const { q, genre } = req.query;
@@ -434,6 +369,71 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({
         success: false,
         error: "Failed to search anime"
+      });
+    }
+  });
+  
+  app.get("/api/anime/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({
+          success: false,
+          error: "Invalid anime ID"
+        });
+      }
+
+      const cacheKey = `anime_${id}`;
+      const cachedData = cache.get(cacheKey);
+      
+      if (cachedData) {
+        return res.json({
+          success: true,
+          data: cachedData
+        });
+      }
+      
+      const data = await jikanApi.getAnimeById(id);
+      cache.set(cacheKey, data);
+      
+      // If user is authenticated, add this to their watch history
+      if ((req as any).user?.id) {
+        try {
+          await storage.addToHistory({
+            user_id: (req as any).user.id,
+            anime_id: id,
+            anime_title: data.title
+          });
+        } catch (err) {
+          // Just log the error, don't fail the request
+          console.error("Error adding to watch history:", err);
+        }
+      } else {
+        // Backward compatibility for query param
+        const userId = parseInt(req.query.user_id as string);
+        if (userId && !isNaN(userId)) {
+          try {
+            await storage.addToHistory({
+              user_id: userId,
+              anime_id: id,
+              anime_title: data.title
+            });
+          } catch (err) {
+            // Just log the error, don't fail the request
+            console.error("Error adding to watch history:", err);
+          }
+        }
+      }
+      
+      res.json({
+        success: true,
+        data
+      });
+    } catch (error) {
+      console.error(`Error fetching anime with ID ${req.params.id}:`, error);
+      res.status(500).json({
+        success: false,
+        error: `Failed to fetch anime with ID ${req.params.id}`
       });
     }
   });
