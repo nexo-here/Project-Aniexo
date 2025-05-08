@@ -5,6 +5,8 @@ import { Button } from "@/components/ui/button";
 import AnimeCard from "@/components/AnimeCard";
 import AnimeCardSmall from "@/components/AnimeCardSmall";
 import AnimeCardLarge from "@/components/AnimeCardLarge";
+import AnimeCardSkeleton from "@/components/AnimeCardSkeleton";
+import { Skeleton } from "@/components/ui/skeleton";
 import { AnimeFull, AnimeBasic, NewsItem } from "@shared/types";
 import { formatDate, truncateText } from "@/lib/utils";
 

@@ -24,9 +24,11 @@ const Search = ({ onClose }: SearchProps) => {
     enabled: true,
   });
   
-  // Search query
+  // Search query - build URL with query parameters
+  const searchUrl = `/api/anime/search${searchTerm || selectedGenre ? '?' : ''}${searchTerm ? `q=${encodeURIComponent(searchTerm)}` : ''}${searchTerm && selectedGenre ? '&' : ''}${selectedGenre ? `genre=${encodeURIComponent(selectedGenre)}` : ''}`;
+  
   const { data: searchResults, isLoading } = useQuery<AnimeBasic[]>({
-    queryKey: ['/api/anime/search', searchTerm, selectedGenre],
+    queryKey: [searchUrl],
     enabled: searchTerm.length > 2 || !!selectedGenre,
   });
   
@@ -104,13 +106,7 @@ const Search = ({ onClose }: SearchProps) => {
             {isLoading ? (
               <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 max-h-96 pt-2">
                 {Array(6).fill(0).map((_, index) => (
-                  <div key={index} className="animate-pulse bg-white dark:bg-neutral-dark rounded-lg overflow-hidden shadow-md">
-                    <div className="bg-gray-300 dark:bg-gray-700 aspect-[2/3] w-full"></div>
-                    <div className="p-2">
-                      <div className="h-4 bg-gray-300 dark:bg-gray-700 rounded w-3/4 mb-2"></div>
-                      <div className="h-3 bg-gray-300 dark:bg-gray-700 rounded w-12"></div>
-                    </div>
-                  </div>
+                  <AnimeCardSkeleton key={index} size="small" />
                 ))}
               </div>
             ) : searchResults && searchResults.length > 0 ? (

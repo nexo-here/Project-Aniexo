@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import AnimeCard from "@/components/AnimeCard";
+import AnimeCardSkeleton from "@/components/AnimeCardSkeleton";
 import { AnimeBasic } from "@shared/types";
 
 const Trending = () => {
@@ -27,13 +28,7 @@ const Trending = () => {
         {isLoading ? (
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-5">
             {Array(20).fill(0).map((_, index) => (
-              <div key={index} className="animate-pulse rounded-xl overflow-hidden shadow-md">
-                <div className="bg-gray-300 dark:bg-gray-700 aspect-[2/3] w-full"></div>
-                <div className="p-3 bg-white dark:bg-neutral-medium">
-                  <div className="h-4 bg-gray-300 dark:bg-gray-700 rounded w-3/4 mb-2"></div>
-                  <div className="h-3 bg-gray-300 dark:bg-gray-700 rounded w-12"></div>
-                </div>
-              </div>
+              <AnimeCardSkeleton key={index} />
             ))}
           </div>
         ) : trendingAnime && trendingAnime.length > 0 ? (
