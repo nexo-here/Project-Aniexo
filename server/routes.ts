@@ -1,19 +1,26 @@
-import type { Express, Request, Response } from "express";
+import type { Express, Request, Response, NextFunction } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import path from "path";
 import * as jikanApi from "./api/jikan";
 import NodeCache from "node-cache";
-import { insertFavoriteSchema, insertHistorySchema, insertCommentSchema } from "@shared/schema";
+import { insertFavoriteSchema, insertHistorySchema, insertCommentSchema, insertUserSchema } from "@shared/schema";
 import { handleDbError } from "./db";
+import cookieParser from "cookie-parser";
+import { authenticateUser, register, login } from "./auth";
 
 // Create a simple cache with 10 minute TTL
 const cache = new NodeCache({ stdTTL: 600, checkperiod: 120 });
 
-// Authentication middleware - To be expanded with actual auth logic
-const requireAuth = (req: Request, res: Response, next: Function) => {
-  // Temporary mock user for development - in a real app this would check session/JWT
-  // For now we'll mock this by adding a user_id query param
+// Authentication middleware that uses the JWT-based authenticateUser middleware
+// but falls back to the query param approach for development
+const requireAuth = async (req: Request, res: Response, next: NextFunction) => {
+  // Check if there's a token in cookies - if so, use the JWT auth middleware
+  if (req.cookies?.token) {
+    return authenticateUser(req, res, next);
+  }
+  
+  // Fallback for development: check for user_id query param
   const userId = parseInt(req.query.user_id as string);
   
   if (!userId || isNaN(userId)) {
@@ -23,12 +30,163 @@ const requireAuth = (req: Request, res: Response, next: Function) => {
     });
   }
   
+  // Get the user to make sure it exists
+  const user = await storage.getUser(userId);
+  if (!user) {
+    return res.status(401).json({
+      success: false,
+      error: "User not found"
+    });
+  }
+  
   // Add user ID to request for use in route handlers
-  (req as any).userId = userId;
+  (req as any).user = {
+    id: userId,
+    username: user.username
+  };
   next();
 };
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Use cookie-parser middleware
+  app.use(cookieParser());
+  
+  // Authentication Routes
+  app.post("/api/auth/register", async (req, res) => {
+    try {
+      // Validate request body
+      const validationResult = insertUserSchema.safeParse(req.body);
+      
+      if (!validationResult.success) {
+        return res.status(400).json({
+          success: false,
+          error: "Invalid user data",
+          details: validationResult.error.format()
+        });
+      }
+      
+      // Register user
+      const result = await register(validationResult.data);
+      
+      if ('error' in result) {
+        return res.status(400).json({
+          success: false,
+          error: result.error
+        });
+      }
+      
+      // Set cookie with token
+      res.cookie('token', result.token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
+      });
+      
+      // Return user data (excluding password)
+      const { password, ...userData } = result.user;
+      
+      return res.status(201).json({
+        success: true,
+        data: {
+          user: userData,
+          token: result.token
+        }
+      });
+    } catch (error) {
+      console.error("Error registering user:", error);
+      return res.status(500).json({
+        success: false,
+        error: "Failed to register user"
+      });
+    }
+  });
+  
+  app.post("/api/auth/login", async (req, res) => {
+    try {
+      const { username, password } = req.body;
+      
+      if (!username || !password) {
+        return res.status(400).json({
+          success: false,
+          error: "Username and password are required"
+        });
+      }
+      
+      // Login user
+      const result = await login(username, password);
+      
+      if ('error' in result) {
+        return res.status(401).json({
+          success: false,
+          error: result.error
+        });
+      }
+      
+      // Set cookie with token
+      res.cookie('token', result.token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
+      });
+      
+      // Return user data (excluding password)
+      const { password: _, ...userData } = result.user;
+      
+      return res.json({
+        success: true,
+        data: {
+          user: userData,
+          token: result.token
+        }
+      });
+    } catch (error) {
+      console.error("Error logging in:", error);
+      return res.status(500).json({
+        success: false,
+        error: "Failed to login"
+      });
+    }
+  });
+  
+  app.post("/api/auth/logout", (req, res) => {
+    // Clear the token cookie
+    res.clearCookie('token');
+    
+    return res.json({
+      success: true,
+      data: { message: "Logged out successfully" }
+    });
+  });
+  
+  app.get("/api/auth/me", authenticateUser, async (req, res) => {
+    try {
+      const userId = (req as any).user.id;
+      
+      // Get user data
+      const user = await storage.getUser(userId);
+      
+      if (!user) {
+        return res.status(404).json({
+          success: false,
+          error: "User not found"
+        });
+      }
+      
+      // Return user data (excluding password)
+      const { password, ...userData } = user;
+      
+      return res.json({
+        success: true,
+        data: userData
+      });
+    } catch (error) {
+      console.error("Error getting user data:", error);
+      return res.status(500).json({
+        success: false,
+        error: "Failed to get user data"
+      });
+    }
+  });
   // API Routes for Anime Data
   app.get("/api/anime/trending", async (req, res) => {
     try {
@@ -193,18 +351,32 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const data = await jikanApi.getAnimeById(id);
       cache.set(cacheKey, data);
       
-      // If a user ID is provided, add this to their watch history
-      const userId = parseInt(req.query.user_id as string);
-      if (userId && !isNaN(userId)) {
+      // If user is authenticated, add this to their watch history
+      if ((req as any).user?.id) {
         try {
           await storage.addToHistory({
-            user_id: userId,
+            user_id: (req as any).user.id,
             anime_id: id,
             anime_title: data.title,
           });
         } catch (err) {
           // Just log the error, don't fail the request
           console.error("Error adding to watch history:", err);
+        }
+      } else {
+        // Backward compatibility for query param
+        const userId = parseInt(req.query.user_id as string);
+        if (userId && !isNaN(userId)) {
+          try {
+            await storage.addToHistory({
+              user_id: userId,
+              anime_id: id,
+              anime_title: data.title,
+            });
+          } catch (err) {
+            // Just log the error, don't fail the request
+            console.error("Error adding to watch history:", err);
+          }
         }
       }
       
@@ -289,7 +461,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // ===== User Favorites Routes =====
   app.get("/api/favorites", requireAuth, async (req, res) => {
     try {
-      const userId = (req as any).userId;
+      const userId = (req as any).user.id;
       
       const favorites = await storage.getFavorites(userId);
       
@@ -308,7 +480,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   app.post("/api/favorites", requireAuth, async (req, res) => {
     try {
-      const userId = (req as any).userId;
+      const userId = (req as any).user.id;
       
       // Validate request
       const validationResult = insertFavoriteSchema.safeParse({
@@ -348,7 +520,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   app.delete("/api/favorites/:animeId", requireAuth, async (req, res) => {
     try {
-      const userId = (req as any).userId;
+      const userId = (req as any).user.id;
       const animeId = parseInt(req.params.animeId);
       
       if (isNaN(animeId)) {
@@ -376,7 +548,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // ===== Watch History Routes =====
   app.get("/api/history", requireAuth, async (req, res) => {
     try {
-      const userId = (req as any).userId;
+      const userId = (req as any).user.id;
       const limit = req.query.limit ? parseInt(req.query.limit as string) : 50;
       
       const history = await storage.getHistory(userId, limit);
@@ -396,7 +568,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   app.post("/api/history", requireAuth, async (req, res) => {
     try {
-      const userId = (req as any).userId;
+      const userId = (req as any).user.id;
       
       // Validate request
       const validationResult = insertHistorySchema.safeParse({
@@ -427,7 +599,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   app.delete("/api/history", requireAuth, async (req, res) => {
     try {
-      const userId = (req as any).userId;
+      const userId = (req as any).user.id;
       
       const success = await storage.clearHistory(userId);
       
@@ -473,7 +645,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   app.post("/api/anime/:animeId/comments", requireAuth, async (req, res) => {
     try {
-      const userId = (req as any).userId;
+      const userId = (req as any).user.id;
       const animeId = parseInt(req.params.animeId);
       
       if (isNaN(animeId)) {
@@ -513,7 +685,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   app.put("/api/comments/:commentId", requireAuth, async (req, res) => {
     try {
-      const userId = (req as any).userId;
+      const userId = (req as any).user.id;
       const commentId = parseInt(req.params.commentId);
       
       if (isNaN(commentId)) {
@@ -555,7 +727,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   app.delete("/api/comments/:commentId", requireAuth, async (req, res) => {
     try {
-      const userId = (req as any).userId;
+      const userId = (req as any).user.id;
       const commentId = parseInt(req.params.commentId);
       
       if (isNaN(commentId)) {
