@@ -6,7 +6,6 @@
 
 import fs from 'fs';
 import path from 'path';
-import { execSync } from 'child_process';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 
@@ -119,15 +118,6 @@ body {
 
 // Write the CSS file to the assets directory
 fs.writeFileSync(path.join(assetsDir, 'style.css'), cssContent);
-
-// Create the server-side portion if needed
-// Note: We're not actually using this in the simplified deployment
-// but we're keeping the structure consistent
-const distServerDir = path.join(__dirname, 'dist');
-fs.writeFileSync(
-  path.join(distServerDir, 'server.js'),
-  `console.log('Aniexo server module (placeholder)');`
-);
 
 console.log('Build completed successfully!');
 console.log(`Files written to: ${distPublicDir}`);

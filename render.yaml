@@ -5,7 +5,7 @@ services:
     region: oregon
     plan: free
     buildCommand: chmod +x render-build.sh && ./render-build.sh
-    startCommand: node production-server.js
+    startCommand: node production-server.mjs
     healthCheckPath: /api/genres
     envVars:
       - key: NODE_ENV
