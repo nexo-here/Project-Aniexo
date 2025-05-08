@@ -28,10 +28,17 @@ const Search = ({ onClose }: SearchProps) => {
   // Search query - build URL with query parameters
   const searchUrl = `/api/anime/search${searchTerm || selectedGenre ? '?' : ''}${searchTerm ? `q=${encodeURIComponent(searchTerm)}` : ''}${searchTerm && selectedGenre ? '&' : ''}${selectedGenre ? `genre=${encodeURIComponent(selectedGenre)}` : ''}`;
   
-  const { data: searchResults, isLoading } = useQuery<AnimeBasic[]>({
-    queryKey: [searchUrl],
+  const { data: searchResults, isLoading, error } = useQuery<AnimeBasic[]>({
+    queryKey: ['/api/anime/search', searchTerm, selectedGenre],
     enabled: searchTerm.length > 2 || !!selectedGenre,
+    retry: 1,
   });
+  
+  useEffect(() => {
+    if (error) {
+      console.error("Error fetching search results:", error);
+    }
+  }, [error]);
   
   // Focus input on mount
   useEffect(() => {

@@ -36,30 +36,30 @@
 }
 
 .dark {
-  --background: 240 10% 9%;
-  --foreground: 0 0% 98%;
-  --muted: 240 3.7% 15.9%;
-  --muted-foreground: 240 5% 64.9%;
-  --popover: 240 10% 9%;
-  --popover-foreground: 0 0% 98%;
+  --background: 240 10% 8%;
+  --foreground: 0 0% 100%;
+  --muted: 240 4% 16%;
+  --muted-foreground: 240 5% 75%;
+  --popover: 240 10% 10%;
+  --popover-foreground: 0 0% 100%;
   --card: 240 10% 12%;
-  --card-foreground: 0 0% 98%;
-  --border: 240 3.7% 15.9%;
-  --input: 240 3.7% 15.9%;
-  --primary: 270 82% 52%;
+  --card-foreground: 0 0% 100%;
+  --border: 240 4% 20%;
+  --input: 240 4% 18%;
+  --primary: 270 82% 60%;
   --primary-dark: 271 91% 36%; 
-  --primary-light: 269 77% 65%;
+  --primary-light: 269 77% 80%;
   --primary-foreground: 211 100% 99%;
-  --secondary: 329 79% 59%;
-  --secondary-foreground: 0 0% 98%;
+  --secondary: 329 79% 65%;
+  --secondary-foreground: 0 0% 100%;
   --accent: 240 5% 26%;
-  --accent-foreground: 0 0% 98%;
-  --destructive: 0 62.8% 30.6%;
-  --destructive-foreground: 0 0% 98%;
+  --accent-foreground: 0 0% 100%;
+  --destructive: 0 75% 50%;
+  --destructive-foreground: 0 0% 100%;
   --ring: 240 4.9% 83.9%;
-  --neutral-dark: 240 10% 13%;
-  --neutral-medium: 240 5% 18%; 
-  --neutral-light: 240 5% 22%;
+  --neutral-dark: 240 10% 11%;
+  --neutral-medium: 240 5% 16%; 
+  --neutral-light: 240 5% 20%;
   --chart-1: 270 82% 52%;
   --chart-2: 329 79% 59%;
   --chart-3: 209 100% 56%;
@@ -70,6 +70,9 @@
 @layer base {
   * {
     @apply border-border;
+    transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 300ms;
   }
 
   body {
@@ -118,7 +121,12 @@
 }
 
 .dark .custom-scrollbar::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 3px;
+}
+
+.dark .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.4);
 }
 
 .carousel {

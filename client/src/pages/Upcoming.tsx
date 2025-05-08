@@ -26,17 +26,8 @@ const Upcoming = () => {
         
         {isLoading ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            {Array(12).fill(0).map((_, index) => (
-              <div key={index} className="animate-pulse rounded-xl overflow-hidden shadow-md">
-                <div className="bg-gray-300 dark:bg-gray-700 h-80 w-full"></div>
-                <div className="p-4 bg-white dark:bg-neutral-medium">
-                  <div className="h-5 bg-gray-300 dark:bg-gray-700 rounded w-3/4 mb-3"></div>
-                  <div className="flex items-center">
-                    <div className="h-4 bg-gray-300 dark:bg-gray-700 rounded w-12 mr-3"></div>
-                    <div className="h-4 bg-gray-300 dark:bg-gray-700 rounded w-24"></div>
-                  </div>
-                </div>
-              </div>
+            {[...Array(12)].map((_, index) => (
+              <AnimeCardSkeleton key={`upcoming-skeleton-${index}`} />
             ))}
           </div>
         ) : upcomingAnime && upcomingAnime.length > 0 ? (

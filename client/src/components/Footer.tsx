@@ -69,13 +69,38 @@ const Footer = () => {
           </div>
           
           <div>
-            <h4 className="font-semibold text-lg mb-4 font-poppins">About</h4>
-            <ul className="space-y-2">
-              <li><a href="#" className="text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-primary transition-colors">About Us</a></li>
-              <li><a href="#" className="text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-primary transition-colors">Contact</a></li>
-              <li><a href="#" className="text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-primary transition-colors">Privacy Policy</a></li>
-              <li><a href="#" className="text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-primary transition-colors">Terms of Service</a></li>
-              <li><a href="#" className="text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-primary transition-colors">API Attribution</a></li>
+            <h4 className="font-semibold text-lg mb-4 font-poppins">Contact Me</h4>
+            <ul className="space-y-3">
+              <li>
+                <a href="https://facebook.com/nexxo.0" target="_blank" rel="noopener noreferrer" className="text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-primary transition-colors flex items-center">
+                  <i className="fab fa-facebook text-lg w-6"></i>
+                  <span>facebook.com/nexxo.0</span>
+                </a>
+              </li>
+              <li>
+                <a href="https://wa.me/+8801609189135" target="_blank" rel="noopener noreferrer" className="text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-primary transition-colors flex items-center">
+                  <i className="fab fa-whatsapp text-lg w-6"></i>
+                  <span>+8801609189135</span>
+                </a>
+              </li>
+              <li>
+                <a href="https://instagram.com/nexo.o.o" target="_blank" rel="noopener noreferrer" className="text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-primary transition-colors flex items-center">
+                  <i className="fab fa-instagram text-lg w-6"></i>
+                  <span>instagram.com/nexo.o.o</span>
+                </a>
+              </li>
+              <li>
+                <a href="mailto:salneowaz@gmail.com" className="text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-primary transition-colors flex items-center">
+                  <i className="fas fa-envelope text-lg w-6"></i>
+                  <span>salneowaz@gmail.com</span>
+                </a>
+              </li>
+              <li>
+                <a href="https://x.com/nexo_here_00" target="_blank" rel="noopener noreferrer" className="text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-primary transition-colors flex items-center">
+                  <i className="fab fa-twitter text-lg w-6"></i>
+                  <span>x.com/nexo_here_00</span>
+                </a>
+              </li>
             </ul>
           </div>
         </div>
