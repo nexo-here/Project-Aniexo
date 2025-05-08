@@ -5,9 +5,15 @@ import AnimeCardSkeleton from "@/components/AnimeCardSkeleton";
 import { AnimeBasic } from "@shared/types";
 
 const Underrated = () => {
-  const { data: underratedAnime, isLoading } = useQuery<AnimeBasic[]>({
+  const { data: underratedAnimeData, isLoading } = useQuery<AnimeBasic[]>({
     queryKey: ['/api/anime/underrated'],
   });
+  
+  // Create a local array with unique identifiers to prevent React key conflicts
+  const underratedAnime = underratedAnimeData?.map((anime, index) => ({
+    ...anime,
+    uniqueKey: `underrated-page-${anime.id}-${index}`
+  }));
   
   // Set page title
   useEffect(() => {
@@ -34,7 +40,7 @@ const Underrated = () => {
         ) : underratedAnime && underratedAnime.length > 0 ? (
           <div className="grid grid-cols-1 gap-6">
             {underratedAnime.map((anime) => (
-              <AnimeCardLarge key={anime.id} anime={anime} />
+              <AnimeCardLarge key={anime.uniqueKey} anime={anime} />
             ))}
           </div>
         ) : (

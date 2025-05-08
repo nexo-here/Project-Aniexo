@@ -10,9 +10,9 @@ const Upcoming = () => {
   });
   
   // Create a local array with unique identifiers to prevent React key conflicts
-  const upcomingAnime = upcomingAnimeData?.map(anime => ({
+  const upcomingAnime = upcomingAnimeData?.map((anime, index) => ({
     ...anime,
-    uniqueKey: `upcoming-page-${anime.id}`
+    uniqueKey: `upcoming-page-${anime.id}-${index}`
   }));
   
   // Set page title
@@ -40,7 +40,7 @@ const Upcoming = () => {
         ) : upcomingAnime && upcomingAnime.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
             {upcomingAnime.map((anime) => (
-              <AnimeCardSmall key={anime.uniqueKey || `upcoming-page-${anime.id}`} anime={anime} />
+              <AnimeCardSmall key={anime.uniqueKey} anime={anime} />
             ))}
           </div>
         ) : (
