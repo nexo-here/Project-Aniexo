@@ -36,11 +36,13 @@ const Home = () => {
     const prevButtons = document.querySelectorAll('.carousel-prev');
     const nextButtons = document.querySelectorAll('.carousel-next');
     
+    const cleanupFunctions: (() => void)[] = [];
+    
     carousels.forEach((carousel, index) => {
       const prevButton = prevButtons[index];
       const nextButton = nextButtons[index];
       
-      if (prevButton && nextButton) {
+      if (prevButton && nextButton && carousel instanceof HTMLElement) {
         const handleNextClick = () => {
           carousel.scrollBy({ left: carousel.offsetWidth * 0.75, behavior: 'smooth' });
         };
@@ -52,12 +54,16 @@ const Home = () => {
         nextButton.addEventListener('click', handleNextClick);
         prevButton.addEventListener('click', handlePrevClick);
         
-        return () => {
+        cleanupFunctions.push(() => {
           nextButton.removeEventListener('click', handleNextClick);
           prevButton.removeEventListener('click', handlePrevClick);
-        };
+        });
       }
     });
+    
+    return () => {
+      cleanupFunctions.forEach(cleanup => cleanup());
+    };
   }, [upcomingAnime]);
   
   return (
@@ -106,11 +112,9 @@ const Home = () => {
                   </Button>
                 )}
                 
-                <Link href={`/anime/${featuredAnime.id}`}>
-                  <a className="bg-white/20 backdrop-blur-sm hover:bg-white/30 text-white py-3 px-6 rounded-lg font-medium flex items-center transition-colors">
-                    <i className="fas fa-info-circle mr-2"></i>
-                    More Info
-                  </a>
+                <Link href={`/anime/${featuredAnime.id}`} className="bg-white/20 backdrop-blur-sm hover:bg-white/30 text-white py-3 px-6 rounded-lg font-medium flex items-center transition-colors">
+                  <i className="fas fa-info-circle mr-2"></i>
+                  More Info
                 </Link>
               </div>
             </div>
@@ -121,11 +125,9 @@ const Home = () => {
               <p className="text-white/90 text-lg mb-5">
                 Explore the world of anime with detailed information, reviews, and recommendations all in one place.
               </p>
-              <Link href="/trending">
-                <a className="bg-primary hover:bg-primary-dark text-white py-3 px-6 rounded-lg font-medium flex items-center transition-colors">
-                  <i className="fas fa-fire mr-2"></i>
-                  Explore Trending Now
-                </a>
+              <Link href="/trending" className="bg-primary hover:bg-primary-dark text-white py-3 px-6 rounded-lg font-medium flex items-center transition-colors">
+                <i className="fas fa-fire mr-2"></i>
+                Explore Trending Now
               </Link>
             </div>
           )}
@@ -194,10 +196,8 @@ const Home = () => {
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between mb-8">
             <h2 className="text-2xl font-bold font-poppins">Upcoming Anime</h2>
-            <Link href="/upcoming">
-              <a className="text-primary hover:text-primary-dark dark:hover:text-primary-light transition-colors flex items-center">
-                View All <i className="fas fa-chevron-right text-xs ml-1"></i>
-              </a>
+            <Link href="/upcoming" className="text-primary hover:text-primary-dark dark:hover:text-primary-light transition-colors flex items-center">
+              View All <i className="fas fa-chevron-right text-xs ml-1"></i>
             </Link>
           </div>
           
@@ -246,10 +246,8 @@ const Home = () => {
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between mb-8">
             <h2 className="text-2xl font-bold font-poppins">Trending Now</h2>
-            <Link href="/trending">
-              <a className="text-primary hover:text-primary-dark dark:hover:text-primary-light transition-colors flex items-center">
-                View All <i className="fas fa-chevron-right text-xs ml-1"></i>
-              </a>
+            <Link href="/trending" className="text-primary hover:text-primary-dark dark:hover:text-primary-light transition-colors flex items-center">
+              View All <i className="fas fa-chevron-right text-xs ml-1"></i>
             </Link>
           </div>
           
@@ -282,10 +280,8 @@ const Home = () => {
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between mb-8">
             <h2 className="text-2xl font-bold font-poppins">Underrated Gems</h2>
-            <Link href="/underrated">
-              <a className="text-primary hover:text-primary-dark dark:hover:text-primary-light transition-colors flex items-center">
-                View All <i className="fas fa-chevron-right text-xs ml-1"></i>
-              </a>
+            <Link href="/underrated" className="text-primary hover:text-primary-dark dark:hover:text-primary-light transition-colors flex items-center">
+              View All <i className="fas fa-chevron-right text-xs ml-1"></i>
             </Link>
           </div>
           

@@ -6,20 +6,14 @@ import { useLocation } from 'wouter';
 import { Link } from 'wouter';
 import { Button } from '@/components/ui/button';
 import { formatDate } from '@/lib/utils';
-
-interface History {
-  id: number;
-  user_id: number;
-  anime_id: number;
-  anime_title: string;
-  created_at: string;
-}
+import { ApiResponse } from '@shared/types';
+import { History as WatchHistory } from '@shared/schema';
 
 export default function History() {
   const { isAuthenticated } = useAuth();
   const [, setLocation] = useLocation();
   const { toast } = useToast();
-  const [watchHistory, setWatchHistory] = useState<History[]>([]);
+  const [watchHistory, setWatchHistory] = useState<WatchHistory[]>([]);
 
   // Redirect to login if not authenticated
   useEffect(() => {
@@ -33,7 +27,7 @@ export default function History() {
     }
   }, [isAuthenticated, setLocation, toast]);
 
-  const { data, isLoading, error } = useQuery({
+  const { data, isLoading, error } = useQuery<ApiResponse<WatchHistory[]>>({
     queryKey: ['/api/history'],
     enabled: isAuthenticated,
   });
@@ -135,7 +129,7 @@ export default function History() {
               {watchHistory.map((item) => (
                 <tr key={item.id} className="bg-white dark:bg-neutral-medium/10 hover:bg-gray-50 dark:hover:bg-neutral-medium/20">
                   <td className="px-6 py-4 font-medium">{item.anime_title}</td>
-                  <td className="px-6 py-4">{formatDate(item.created_at)}</td>
+                  <td className="px-6 py-4">{item.viewed_at ? formatDate(item.viewed_at.toString()) : 'Unknown'}</td>
                   <td className="px-6 py-4">
                     <Link 
                       href={`/anime/${item.anime_id}`}

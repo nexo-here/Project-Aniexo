@@ -4,16 +4,8 @@ import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/use-auth';
 import { useLocation } from 'wouter';
 import AnimeCardSmall from '@/components/AnimeCardSmall';
-import { AnimeBasic } from '@shared/types';
-
-interface Favorite {
-  id: number;
-  user_id: number;
-  anime_id: number;
-  anime_title: string;
-  anime_image: string;
-  created_at: string;
-}
+import { AnimeBasic, ApiResponse } from '@shared/types';
+import { Favorite } from '@shared/schema';
 
 export default function Favorites() {
   const { isAuthenticated } = useAuth();
@@ -33,7 +25,7 @@ export default function Favorites() {
     }
   }, [isAuthenticated, setLocation, toast]);
 
-  const { data, isLoading, error } = useQuery({
+  const { data, isLoading, error } = useQuery<ApiResponse<Favorite[]>>({
     queryKey: ['/api/favorites'],
     enabled: isAuthenticated,
   });
