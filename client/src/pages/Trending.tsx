@@ -5,9 +5,15 @@ import AnimeCardSkeleton from "@/components/AnimeCardSkeleton";
 import { AnimeBasic } from "@shared/types";
 
 const Trending = () => {
-  const { data: trendingAnime, isLoading } = useQuery<AnimeBasic[]>({
+  const { data: trendingAnimeData, isLoading } = useQuery<AnimeBasic[]>({
     queryKey: ['/api/anime/trending'],
   });
+  
+  // Create a local array with unique identifiers to prevent React key conflicts
+  const trendingAnime = trendingAnimeData?.map(anime => ({
+    ...anime,
+    uniqueKey: `trending-page-${anime.id}`
+  }));
   
   // Set page title
   useEffect(() => {
@@ -34,7 +40,7 @@ const Trending = () => {
         ) : trendingAnime && trendingAnime.length > 0 ? (
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-5">
             {trendingAnime.map((anime) => (
-              <AnimeCard key={anime.id} anime={anime} />
+              <AnimeCard key={anime.uniqueKey || `trending-page-${anime.id}`} anime={anime} />
             ))}
           </div>
         ) : (

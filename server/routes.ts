@@ -409,13 +409,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const cachedData = cache.get(cacheKey);
       
       if (cachedData) {
+        console.log(`Returning cached search results for query="${q}", genre="${genre}"`);
         return res.json({
           success: true,
           data: cachedData
         });
       }
       
-      console.log(`Search request: query="${q}", genre="${genre}"`);
+      console.log(`Performing search request: query="${q}", genre="${genre}"`);
       
       const data = await jikanApi.searchAnime(
         q ? q.toString() : undefined, 

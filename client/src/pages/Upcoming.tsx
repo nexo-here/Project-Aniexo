@@ -5,9 +5,15 @@ import AnimeCardSkeleton from "@/components/AnimeCardSkeleton";
 import { AnimeBasic } from "@shared/types";
 
 const Upcoming = () => {
-  const { data: upcomingAnime, isLoading } = useQuery<AnimeBasic[]>({
+  const { data: upcomingAnimeData, isLoading } = useQuery<AnimeBasic[]>({
     queryKey: ['/api/anime/upcoming'],
   });
+  
+  // Create a local array with unique identifiers to prevent React key conflicts
+  const upcomingAnime = upcomingAnimeData?.map(anime => ({
+    ...anime,
+    uniqueKey: `upcoming-page-${anime.id}`
+  }));
   
   // Set page title
   useEffect(() => {
@@ -34,7 +40,7 @@ const Upcoming = () => {
         ) : upcomingAnime && upcomingAnime.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
             {upcomingAnime.map((anime) => (
-              <AnimeCardSmall key={anime.id} anime={anime} />
+              <AnimeCardSmall key={anime.uniqueKey || `upcoming-page-${anime.id}`} anime={anime} />
             ))}
           </div>
         ) : (

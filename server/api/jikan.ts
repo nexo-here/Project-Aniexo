@@ -178,16 +178,38 @@ export async function getAnimeById(id: number): Promise<AnimeFull> {
 // Search anime by query or genre
 export async function searchAnime(query?: string, genre?: string): Promise<AnimeBasic[]> {
   try {
-    let url = `${API_BASE_URL}/anime?order_by=popularity&sort=asc&limit=20`;
+    let url = `${API_BASE_URL}/anime?limit=24`;
     
     if (query) {
       url += `&q=${encodeURIComponent(query)}`;
     }
     
     if (genre) {
-      url += `&genres=${encodeURIComponent(genre)}`;
+      // For exact genre search, use a separate call to get genre ID
+      try {
+        const genresResponse = await rateLimitedFetch(`${API_BASE_URL}/genres/anime`);
+        const genres = genresResponse.data.data;
+        const genreObj = genres.find((g: any) => 
+          g.name.toLowerCase() === genre.toLowerCase()
+        );
+        
+        if (genreObj) {
+          url += `&genres=${genreObj.mal_id}`;
+        } else {
+          console.log(`Genre "${genre}" not found in Jikan API, using as search query`);
+          // If genre not found, use it as part of the search query
+          url += query ? `&genres_exclude=0` : `&q=${encodeURIComponent(genre)}`;
+        }
+      } catch (genreError) {
+        console.error('Error fetching genres, using genre as query:', genreError);
+        url += query ? `` : `&q=${encodeURIComponent(genre)}`;
+      }
     }
     
+    // Add ordering by popularity for better results
+    url += `&order_by=popularity&sort=asc`;
+    
+    console.log(`Searching anime with URL: ${url}`);
     const response = await rateLimitedFetch(url);
     return response.data.data.map(transformAnimeData);
   } catch (error) {
