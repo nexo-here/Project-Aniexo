@@ -20,24 +20,27 @@ npm install --no-save pg https express fs
 
 # Create a simple vite.config.js for building the client
 echo "Creating Vite config..."
-cat > simple-vite.config.js << 'EOL'
-const path = require('path');
-const { defineConfig } = require('vite');
-const react = require('@vitejs/plugin-react');
+cat > simple-vite.config.mjs << 'EOL'
+import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
+import { fileURLToPath } from 'url';
+import { dirname, resolve } from 'path';
 
-module.exports = defineConfig({
+const __dirname = dirname(fileURLToPath(import.meta.url));
+
+export default defineConfig({
   plugins: [react()],
   build: {
-    outDir: path.resolve(__dirname, 'dist/public'),
+    outDir: resolve(__dirname, 'dist/public'),
     emptyOutDir: true,
   },
   resolve: {
     alias: {
-      '@': path.resolve(__dirname, 'client/src'),
-      '@shared': path.resolve(__dirname, 'shared'),
+      '@': resolve(__dirname, 'client/src'),
+      '@shared': resolve(__dirname, 'shared'),
     },
   },
-  root: path.resolve(__dirname, 'client'),
+  root: resolve(__dirname, 'client'),
 });
 EOL
 
@@ -62,7 +65,7 @@ fi
 
 # Build the client
 echo "Building frontend..."
-if ! npx vite build --config simple-vite.config.js; then
+if ! npx vite build --config simple-vite.config.mjs; then
   echo "Vite build failed. Creating fallback page..."
   cat > ./dist/public/index.html << 'EOL'
 <!DOCTYPE html>
