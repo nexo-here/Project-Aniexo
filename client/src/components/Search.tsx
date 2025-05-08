@@ -13,6 +13,10 @@ const Search = ({ onClose }: SearchProps) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedGenre, setSelectedGenre] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const [imageErrors, setImageErrors] = useState<{[key: number]: boolean}>({});
+  
+  // Placeholder image if the actual image fails to load
+  const fallbackImageUrl = "https://via.placeholder.com/180x250?text=No+Image";
   
   // Fetch genres for quick filtering
   const { data: genres } = useQuery<{id: number, name: string}[]>({
@@ -44,6 +48,10 @@ const Search = ({ onClose }: SearchProps) => {
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [onClose]);
+  
+  const handleImageError = (animeId: number) => {
+    setImageErrors(prev => ({...prev, [animeId]: true}));
+  };
   
   const handleGenreClick = (genre: string) => {
     if (selectedGenre === genre) {
@@ -94,7 +102,17 @@ const Search = ({ onClose }: SearchProps) => {
         {(searchTerm.length > 2 || selectedGenre) && (
           <div className="mt-6">
             {isLoading ? (
-              <p className="text-center py-4">Searching...</p>
+              <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 max-h-96 pt-2">
+                {Array(6).fill(0).map((_, index) => (
+                  <div key={index} className="animate-pulse bg-white dark:bg-neutral-dark rounded-lg overflow-hidden shadow-md">
+                    <div className="bg-gray-300 dark:bg-gray-700 aspect-[2/3] w-full"></div>
+                    <div className="p-2">
+                      <div className="h-4 bg-gray-300 dark:bg-gray-700 rounded w-3/4 mb-2"></div>
+                      <div className="h-3 bg-gray-300 dark:bg-gray-700 rounded w-12"></div>
+                    </div>
+                  </div>
+                ))}
+              </div>
             ) : searchResults && searchResults.length > 0 ? (
               <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 max-h-96 overflow-y-auto custom-scrollbar pt-2">
                 {searchResults.map((anime) => (
@@ -102,32 +120,32 @@ const Search = ({ onClose }: SearchProps) => {
                     key={anime.id} 
                     href={`/anime/${anime.id}`}
                     onClick={onClose}
+                    className="anime-card rounded-lg overflow-hidden shadow-md bg-white dark:bg-neutral-medium hover:shadow-lg transition-shadow"
                   >
-                    <a className="anime-card rounded-lg overflow-hidden shadow-md bg-white dark:bg-neutral-medium">
-                      <div className="relative">
-                        <img 
-                          src={anime.image} 
-                          alt={anime.title}
-                          className="w-full aspect-[2/3] object-cover"
-                          loading="lazy"
-                        />
-                        {anime.score && (
-                          <div className="absolute top-2 right-2 bg-black/70 backdrop-blur-sm text-white px-2 py-1 rounded text-xs font-medium flex items-center">
-                            <i className="fas fa-star text-yellow-400 mr-1"></i> {anime.score.toFixed(1)}
-                          </div>
-                        )}
-                      </div>
-                      <div className="p-2">
-                        <h3 className="font-montserrat font-semibold text-sm truncate">{anime.title}</h3>
-                        {anime.genres && anime.genres.length > 0 && (
-                          <div className="mt-1 text-xs text-gray-600 dark:text-gray-300">
-                            <span className="bg-gray-200 dark:bg-neutral-dark rounded-full px-2 py-0.5 truncate">
-                              {anime.genres[0]}
-                            </span>
-                          </div>
-                        )}
-                      </div>
-                    </a>
+                    <div className="relative">
+                      <img 
+                        src={imageErrors[anime.id] ? fallbackImageUrl : anime.image} 
+                        alt={anime.title}
+                        className="w-full aspect-[2/3] object-cover"
+                        loading="lazy"
+                        onError={() => handleImageError(anime.id)}
+                      />
+                      {anime.score && (
+                        <div className="absolute top-2 right-2 bg-black/70 backdrop-blur-sm text-white px-2 py-1 rounded text-xs font-medium flex items-center">
+                          <i className="fas fa-star text-yellow-400 mr-1"></i> {anime.score.toFixed(1)}
+                        </div>
+                      )}
+                    </div>
+                    <div className="p-2">
+                      <h3 className="font-montserrat font-semibold text-sm truncate">{anime.title}</h3>
+                      {anime.genres && anime.genres.length > 0 && (
+                        <div className="mt-1 text-xs text-gray-600 dark:text-gray-300">
+                          <span className="bg-gray-200 dark:bg-neutral-dark rounded-full px-2 py-0.5 truncate">
+                            {anime.genres[0]}
+                          </span>
+                        </div>
+                      )}
+                    </div>
                   </Link>
                 ))}
               </div>

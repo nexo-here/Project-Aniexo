@@ -38,33 +38,23 @@ const Navbar = () => {
       <div className="container mx-auto px-4">
         <nav className="flex items-center justify-between py-4">
           {/* Logo */}
-          <Link href="/">
-            <a className="flex items-center space-x-2">
-              <span className="text-2xl font-bold text-primary font-poppins">Aniexo</span>
-            </a>
+          <Link href="/" className="flex items-center space-x-2">
+            <span className="text-2xl font-bold text-primary font-poppins">Aniexo</span>
           </Link>
           
           {/* Desktop Menu */}
           <div className="hidden md:flex items-center space-x-8">
-            <Link href="/">
-              <a className={`font-medium ${location === '/' ? 'text-primary' : 'text-neutral-dark/70 dark:text-white/70'} hover:text-primary dark:hover:text-primary transition-colors`}>
-                Home
-              </a>
+            <Link href="/" className={`font-medium ${location === '/' ? 'text-primary' : 'text-neutral-dark/70 dark:text-white/70'} hover:text-primary dark:hover:text-primary transition-colors`}>
+              Home
             </Link>
-            <Link href="/upcoming">
-              <a className={`font-medium ${location === '/upcoming' ? 'text-primary' : 'text-neutral-dark/70 dark:text-white/70'} hover:text-primary dark:hover:text-primary transition-colors`}>
-                Upcoming
-              </a>
+            <Link href="/upcoming" className={`font-medium ${location === '/upcoming' ? 'text-primary' : 'text-neutral-dark/70 dark:text-white/70'} hover:text-primary dark:hover:text-primary transition-colors`}>
+              Upcoming
             </Link>
-            <Link href="/trending">
-              <a className={`font-medium ${location === '/trending' ? 'text-primary' : 'text-neutral-dark/70 dark:text-white/70'} hover:text-primary dark:hover:text-primary transition-colors`}>
-                Trending
-              </a>
+            <Link href="/trending" className={`font-medium ${location === '/trending' ? 'text-primary' : 'text-neutral-dark/70 dark:text-white/70'} hover:text-primary dark:hover:text-primary transition-colors`}>
+              Trending
             </Link>
-            <Link href="/underrated">
-              <a className={`font-medium ${location === '/underrated' ? 'text-primary' : 'text-neutral-dark/70 dark:text-white/70'} hover:text-primary dark:hover:text-primary transition-colors`}>
-                Underrated
-              </a>
+            <Link href="/underrated" className={`font-medium ${location === '/underrated' ? 'text-primary' : 'text-neutral-dark/70 dark:text-white/70'} hover:text-primary dark:hover:text-primary transition-colors`}>
+              Underrated
             </Link>
           </div>
           
@@ -107,37 +97,33 @@ const Navbar = () => {
       {mobileMenuOpen && (
         <div className="md:hidden bg-white dark:bg-neutral-medium border-t border-gray-200 dark:border-neutral-medium py-4 shadow-md">
           <div className="container mx-auto px-4 flex flex-col space-y-4">
-            <Link href="/">
-              <a 
-                className={`font-medium py-2 border-b border-gray-100 dark:border-neutral-dark ${location === '/' ? 'text-primary' : 'text-neutral-dark dark:text-white'}`}
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                Home
-              </a>
+            <Link 
+              href="/" 
+              className={`font-medium py-2 border-b border-gray-100 dark:border-neutral-dark ${location === '/' ? 'text-primary' : 'text-neutral-dark dark:text-white'}`}
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              Home
             </Link>
-            <Link href="/upcoming">
-              <a 
-                className={`font-medium py-2 border-b border-gray-100 dark:border-neutral-dark ${location === '/upcoming' ? 'text-primary' : 'text-neutral-dark dark:text-white'}`}
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                Upcoming
-              </a>
+            <Link 
+              href="/upcoming" 
+              className={`font-medium py-2 border-b border-gray-100 dark:border-neutral-dark ${location === '/upcoming' ? 'text-primary' : 'text-neutral-dark dark:text-white'}`}
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              Upcoming
             </Link>
-            <Link href="/trending">
-              <a 
-                className={`font-medium py-2 border-b border-gray-100 dark:border-neutral-dark ${location === '/trending' ? 'text-primary' : 'text-neutral-dark dark:text-white'}`}
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                Trending
-              </a>
+            <Link 
+              href="/trending" 
+              className={`font-medium py-2 border-b border-gray-100 dark:border-neutral-dark ${location === '/trending' ? 'text-primary' : 'text-neutral-dark dark:text-white'}`}
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              Trending
             </Link>
-            <Link href="/underrated">
-              <a 
-                className={`font-medium py-2 ${location === '/underrated' ? 'text-primary' : 'text-neutral-dark dark:text-white'}`}
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                Underrated
-              </a>
+            <Link 
+              href="/underrated" 
+              className={`font-medium py-2 ${location === '/underrated' ? 'text-primary' : 'text-neutral-dark dark:text-white'}`}
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              Underrated
             </Link>
           </div>
         </div>

@@ -6,10 +6,8 @@ const Footer = () => {
       <div className="container mx-auto px-4">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div>
-            <Link href="/">
-              <a className="flex items-center space-x-2 mb-4">
-                <span className="text-2xl font-bold text-primary font-poppins">Aniexo</span>
-              </a>
+            <Link href="/" className="flex items-center space-x-2 mb-4">
+              <span className="text-2xl font-bold text-primary font-poppins">Aniexo</span>
             </Link>
             <p className="text-gray-600 dark:text-gray-300 text-sm mb-4">
               Your ultimate anime information hub with the latest updates, reviews, and comprehensive details on all your favorite series.
@@ -34,23 +32,23 @@ const Footer = () => {
             <h4 className="font-semibold text-lg mb-4 font-poppins">Navigate</h4>
             <ul className="space-y-2">
               <li>
-                <Link href="/">
-                  <a className="text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-primary transition-colors">Home</a>
+                <Link href="/" className="text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-primary transition-colors">
+                  Home
                 </Link>
               </li>
               <li>
-                <Link href="/upcoming">
-                  <a className="text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-primary transition-colors">Upcoming Anime</a>
+                <Link href="/upcoming" className="text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-primary transition-colors">
+                  Upcoming Anime
                 </Link>
               </li>
               <li>
-                <Link href="/trending">
-                  <a className="text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-primary transition-colors">Trending Now</a>
+                <Link href="/trending" className="text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-primary transition-colors">
+                  Trending Now
                 </Link>
               </li>
               <li>
-                <Link href="/underrated">
-                  <a className="text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-primary transition-colors">Underrated Gems</a>
+                <Link href="/underrated" className="text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-primary transition-colors">
+                  Underrated Gems
                 </Link>
               </li>
               <li>
