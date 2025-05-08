@@ -25,11 +25,32 @@ const Search = ({ onClose }: SearchProps) => {
     enabled: true,
   });
   
-  // Search query - build URL with query parameters
-  const searchUrl = `/api/anime/search${searchTerm || selectedGenre ? '?' : ''}${searchTerm ? `q=${encodeURIComponent(searchTerm)}` : ''}${searchTerm && selectedGenre ? '&' : ''}${selectedGenre ? `genre=${encodeURIComponent(selectedGenre)}` : ''}`;
+  // Build query parameters for the search
+  const searchParams = new URLSearchParams();
+  if (searchTerm) searchParams.append('q', searchTerm);
+  if (selectedGenre) searchParams.append('genre', selectedGenre);
+  
+  const searchUrl = `/api/anime/search?${searchParams.toString()}`;
   
   const { data: searchResults, isLoading, error } = useQuery<AnimeBasic[]>({
-    queryKey: ['/api/anime/search', searchTerm, selectedGenre],
+    queryKey: ['animeSearch', searchTerm, selectedGenre],
+    queryFn: async () => {
+      if (searchTerm.length < 3 && !selectedGenre) {
+        return [];
+      }
+      
+      try {
+        const response = await fetch(searchUrl);
+        if (!response.ok) {
+          throw new Error('Failed to fetch search results');
+        }
+        const data = await response.json();
+        return data.success ? data.data : [];
+      } catch (error) {
+        console.error('Error fetching search results:', error);
+        throw error;
+      }
+    },
     enabled: searchTerm.length > 2 || !!selectedGenre,
     retry: 1,
   });
@@ -73,7 +94,7 @@ const Search = ({ onClose }: SearchProps) => {
   };
   
   return (
-    <div className="bg-white dark:bg-neutral-medium border-t border-gray-200 dark:border-neutral-medium py-4 shadow-md">
+    <div className="bg-white dark:bg-neutral-dark border-t border-gray-200 dark:border-neutral-dark py-4 shadow-md">
       <div className="container mx-auto px-4">
         <div className="relative">
           <Input
@@ -82,7 +103,7 @@ const Search = ({ onClose }: SearchProps) => {
             placeholder="Search anime by title, genre, studio..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-neutral-dark focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all"
+            className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-neutral-dark text-gray-900 dark:text-white placeholder:text-gray-500 dark:placeholder:text-gray-400 focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all"
           />
           <button 
             className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 dark:text-gray-400 hover:text-primary dark:hover:text-primary transition-colors"
@@ -124,7 +145,7 @@ const Search = ({ onClose }: SearchProps) => {
                     key={anime.id} 
                     href={`/anime/${anime.id}`}
                     onClick={onClose}
-                    className="anime-card rounded-lg overflow-hidden shadow-md bg-white dark:bg-neutral-medium hover:shadow-lg transition-shadow"
+                    className="anime-card rounded-lg overflow-hidden shadow-md bg-white dark:bg-neutral-medium hover:shadow-lg transition-shadow text-gray-900 dark:text-white"
                   >
                     <div className="relative">
                       <img 
@@ -154,7 +175,7 @@ const Search = ({ onClose }: SearchProps) => {
                 ))}
               </div>
             ) : (
-              <p className="text-center py-4">No results found. Try a different search term or genre.</p>
+              <p className="text-center py-4 text-gray-700 dark:text-gray-300">No results found. Try a different search term or genre.</p>
             )}
           </div>
         )}
