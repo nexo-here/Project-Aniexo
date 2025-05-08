@@ -245,3 +245,144 @@ export async function getGenres(): Promise<{ id: number, name: string }[]> {
     throw error;
   }
 }
+
+// Mood-based anime recommendation
+export async function getAnimeRecommendationsByMood(
+  mood: string, 
+  genres?: string[], 
+  watchHistory?: number[]
+): Promise<AnimeBasic[]> {
+  try {
+    // Map moods to appropriate search parameters
+    const moodMappings: Record<string, {
+      minScore?: number;
+      genres?: string[];
+      status?: string;
+      orderBy?: string;
+      sort?: string;
+      limit?: number;
+    }> = {
+      "happy": { 
+        minScore: 7.5, 
+        genres: ["Comedy", "Slice of Life"],
+        status: "complete",
+        orderBy: "popularity" 
+      },
+      "sad": { 
+        minScore: 7.8, 
+        genres: ["Drama", "Tragedy"],
+        orderBy: "score",
+        sort: "desc" 
+      },
+      "excited": { 
+        minScore: 8.0, 
+        genres: ["Action", "Adventure", "Fantasy"],
+        orderBy: "popularity" 
+      },
+      "relaxed": { 
+        minScore: 7.0, 
+        genres: ["Slice of Life", "Iyashikei", "Comedy"],
+        orderBy: "score" 
+      },
+      "curious": { 
+        minScore: 7.5, 
+        genres: ["Mystery", "Psychological", "Sci-Fi"],
+        orderBy: "score",
+        sort: "desc" 
+      },
+      "romantic": { 
+        minScore: 7.0, 
+        genres: ["Romance", "Shoujo"],
+        orderBy: "popularity" 
+      },
+      "adventurous": { 
+        minScore: 7.5, 
+        genres: ["Adventure", "Fantasy", "Action"],
+        orderBy: "popularity" 
+      }
+    };
+
+    // Default to "happy" if mood is not in our mappings
+    const moodParams = moodMappings[mood.toLowerCase()] || moodMappings["happy"];
+    
+    // Incorporate user's genre preferences if provided
+    let targetGenres = moodParams.genres || [];
+    if (genres && genres.length > 0) {
+      // Combine and deduplicate without using Set (for compatibility)
+      const combinedGenres = [...targetGenres];
+      genres.forEach(genre => {
+        if (!combinedGenres.includes(genre)) {
+          combinedGenres.push(genre);
+        }
+      });
+      targetGenres = combinedGenres;
+    }
+    
+    // Build URL with parameters
+    let url = `${API_BASE_URL}/anime?limit=${moodParams.limit || 12}`;
+    
+    if (moodParams.minScore) {
+      url += `&min_score=${moodParams.minScore}`;
+    }
+    
+    if (moodParams.status) {
+      url += `&status=${moodParams.status}`;
+    }
+    
+    url += `&order_by=${moodParams.orderBy || "score"}`;
+    url += `&sort=${moodParams.sort || "desc"}`;
+    
+    // We'll use the first genre for the request to get a good starting set
+    if (targetGenres.length > 0) {
+      try {
+        const genresResponse = await rateLimitedFetch(`${API_BASE_URL}/genres/anime`);
+        const genresData = genresResponse.data.data;
+        
+        // Find genre ID for the first preferred genre
+        const genreObj = genresData.find((g: any) => 
+          targetGenres.some(tg => g.name.toLowerCase() === tg.toLowerCase())
+        );
+        
+        if (genreObj) {
+          url += `&genres=${genreObj.mal_id}`;
+        }
+      } catch (error) {
+        console.error('Error fetching genres for recommendations:', error);
+      }
+    }
+
+    console.log(`Fetching mood-based recommendations with URL: ${url}`);
+    const response = await rateLimitedFetch(url);
+    let recommendations = response.data.data.map(transformAnimeData);
+    
+    // Filter out titles if they're in the watch history
+    if (watchHistory && watchHistory.length > 0) {
+      recommendations = recommendations.filter((anime: AnimeBasic) => !watchHistory.includes(anime.id));
+    }
+    
+    // If we have too few recommendations, supplement with trending anime
+    if (recommendations.length < 6) {
+      const trending = await getTrendingAnime();
+      
+      const uniqueRecs = [...recommendations];
+      const existingIds = new Set(uniqueRecs.map(a => a.id));
+      
+      // Add trending anime that isn't already in recommendations and isn't in watch history
+      for (const anime of trending) {
+        if (!existingIds.has(anime.id) && 
+            (!watchHistory || !watchHistory.includes(anime.id))) {
+          uniqueRecs.push(anime);
+          existingIds.add(anime.id);
+          if (uniqueRecs.length >= 10) break;
+        }
+      }
+      
+      recommendations = uniqueRecs;
+    }
+    
+    return recommendations.slice(0, 12); // Return max 12 recommendations
+  } catch (error) {
+    console.error('Error getting anime recommendations by mood:', error);
+    throw error;
+  }
+}

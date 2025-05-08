@@ -768,6 +768,73 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // ===== Anime Matchmaker / Recommendation Routes =====
+  app.get("/api/recommendations", async (req, res) => {
+    try {
+      const { mood } = req.query;
+      const genres = req.query.genres ? 
+        Array.isArray(req.query.genres) ? 
+          req.query.genres as string[] : 
+          [req.query.genres as string] 
+        : undefined;
+      
+      // Check if mood is provided
+      if (!mood) {
+        return res.status(400).json({
+          success: false,
+          error: "Mood parameter is required"
+        });
+      }
+
+      // Get watch history for authenticated user, if available
+      let watchHistory: number[] | undefined = undefined;
+      
+      if ((req as any).user?.id) {
+        try {
+          const history = await storage.getHistory((req as any).user.id, 20);
+          watchHistory = history.map(item => item.anime_id);
+        } catch (err) {
+          console.error("Error getting watch history for recommendations:", err);
+          // Continue without watch history
+        }
+      } else if (req.query.user_id) {
+        // Fallback for query param based auth
+        const userId = parseInt(req.query.user_id as string);
+        if (!isNaN(userId)) {
+          try {
+            const history = await storage.getHistory(userId, 20);
+            watchHistory = history.map(item => item.anime_id);
+          } catch (err) {
+            console.error("Error getting watch history for recommendations:", err);
+            // Continue without watch history
+          }
+        }
+      }
+      
+      // Generate recommendations based on mood, genres, and watch history
+      const recommendations = await jikanApi.getAnimeRecommendationsByMood(
+        mood as string,
+        genres,
+        watchHistory
+      );
+      
+      // Cache the results with a short TTL (5 minutes)
+      const cacheKey = `recommendations_${mood}_${genres ? genres.join('_') : ''}_${watchHistory ? 'history' : 'no-history'}`;
+      cache.set(cacheKey, recommendations, 300); // 300 seconds = 5 minutes
+      
+      return res.json({
+        success: true,
+        data: recommendations
+      });
+    } catch (error) {
+      console.error("Error getting anime recommendations:", error);
+      return res.status(500).json({
+        success: false,
+        error: "Failed to get anime recommendations"
+      });
+    }
+  });
+
   const httpServer = createServer(app);
 
   return httpServer;
