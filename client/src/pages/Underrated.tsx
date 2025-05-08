@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import AnimeCardLarge from "@/components/AnimeCardLarge";
+import AnimeCardSkeleton from "@/components/AnimeCardSkeleton";
 import { AnimeBasic } from "@shared/types";
 
 const Underrated = () => {

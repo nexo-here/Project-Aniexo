@@ -27,8 +27,8 @@ const Trending = () => {
         
         {isLoading ? (
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-5">
-            {Array(20).fill(0).map((_, index) => (
-              <AnimeCardSkeleton key={index} />
+            {[...Array(20)].map((_, index) => (
+              <AnimeCardSkeleton key={`trending-page-skeleton-${index}`} />
             ))}
           </div>
         ) : trendingAnime && trendingAnime.length > 0 ? (
