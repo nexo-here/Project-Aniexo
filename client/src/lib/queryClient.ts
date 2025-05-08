@@ -29,16 +29,29 @@ export const getQueryFn: <T>(options: {
 }) => QueryFunction<T> =
   ({ on401: unauthorizedBehavior }) =>
   async ({ queryKey }) => {
-    const res = await fetch(queryKey[0] as string, {
-      credentials: "include",
-    });
+    try {
+      const res = await fetch(queryKey[0] as string, {
+        credentials: "include",
+      });
 
-    if (unauthorizedBehavior === "returnNull" && res.status === 401) {
-      return null;
+      if (unauthorizedBehavior === "returnNull" && res.status === 401) {
+        return null;
+      }
+
+      await throwIfResNotOk(res);
+      const data = await res.json();
+      
+      // Make sure the response has the expected structure
+      if (data && data.success === true && data.data !== undefined) {
+        return data.data;
+      } else {
+        console.error("Unexpected API response format:", data);
+        throw new Error("Unexpected API response format");
+      }
+    } catch (error) {
+      console.error(`Error fetching from ${queryKey[0]}:`, error);
+      throw error;
     }
-
-    await throwIfResNotOk(res);
-    return await res.json();
   };
 
 export const queryClient = new QueryClient({

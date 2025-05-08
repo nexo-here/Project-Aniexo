@@ -10,24 +10,34 @@ import { formatDate, truncateText } from "@/lib/utils";
 
 const Home = () => {
   // Fetch data for different sections
-  const { data: featuredAnime, isLoading: loadingFeatured } = useQuery<AnimeFull>({
+  const { data: featuredAnime, isLoading: loadingFeatured, error: featuredError } = useQuery<AnimeFull>({
     queryKey: ['/api/anime/featured'],
+    retry: 3,
+    retryDelay: (attempt) => Math.min(attempt > 1 ? 2 ** attempt * 1000 : 1000, 30000)
   });
   
-  const { data: trendingAnime, isLoading: loadingTrending } = useQuery<AnimeBasic[]>({
+  const { data: trendingAnime, isLoading: loadingTrending, error: trendingError } = useQuery<AnimeBasic[]>({
     queryKey: ['/api/anime/trending'],
+    retry: 3,
+    retryDelay: (attempt) => Math.min(attempt > 1 ? 2 ** attempt * 1000 : 1000, 30000)
   });
   
-  const { data: upcomingAnime, isLoading: loadingUpcoming } = useQuery<AnimeBasic[]>({
+  const { data: upcomingAnime, isLoading: loadingUpcoming, error: upcomingError } = useQuery<AnimeBasic[]>({
     queryKey: ['/api/anime/upcoming'],
+    retry: 3,
+    retryDelay: (attempt) => Math.min(attempt > 1 ? 2 ** attempt * 1000 : 1000, 30000)
   });
   
-  const { data: underratedAnime, isLoading: loadingUnderrated } = useQuery<AnimeBasic[]>({
+  const { data: underratedAnime, isLoading: loadingUnderrated, error: underratedError } = useQuery<AnimeBasic[]>({
     queryKey: ['/api/anime/underrated'],
+    retry: 3,
+    retryDelay: (attempt) => Math.min(attempt > 1 ? 2 ** attempt * 1000 : 1000, 30000)
   });
   
-  const { data: newsItems, isLoading: loadingNews } = useQuery<NewsItem[]>({
+  const { data: newsItems, isLoading: loadingNews, error: newsError } = useQuery<NewsItem[]>({
     queryKey: ['/api/anime/news'],
+    retry: 3,
+    retryDelay: (attempt) => Math.min(attempt > 1 ? 2 ** attempt * 1000 : 1000, 30000)
   });
   
   // Carousel scroll functionality

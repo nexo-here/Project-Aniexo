@@ -4,13 +4,14 @@ import { AnimeBasic, AnimeFull, NewsItem } from '@shared/types';
 // Jikan API base URL
 const API_BASE_URL = 'https://api.jikan.moe/v4';
 
-// Rate limiting helper - Jikan has a rate limit of 3 requests per second
-// This function adds a small delay between consecutive requests
+// Rate limiting helper - Jikan has a rate limit of 3 requests per second (60/min)
+// This function adds a delay between consecutive requests and handles retries
 const rateLimitedFetch = (() => {
   let lastFetchTime = 0;
-  const RATE_LIMIT_INTERVAL = 350; // ms between requests
+  const RATE_LIMIT_INTERVAL = 1500; // 1.5 seconds between requests to be safer
+  const MAX_RETRIES = 3;
 
-  return async (url: string) => {
+  return async (url: string, retryCount = 0): Promise<any> => {
     const now = Date.now();
     const timeElapsed = now - lastFetchTime;
     
@@ -18,8 +19,21 @@ const rateLimitedFetch = (() => {
       await new Promise(resolve => setTimeout(resolve, RATE_LIMIT_INTERVAL - timeElapsed));
     }
     
-    lastFetchTime = Date.now();
-    return axios.get(url);
+    try {
+      lastFetchTime = Date.now();
+      return await axios.get(url);
+    } catch (error: any) {
+      // If we hit a rate limit and have retries left, wait longer and try again
+      if (error.response && error.response.status === 429 && retryCount < MAX_RETRIES) {
+        console.warn(`Rate limit hit for ${url}, retrying (${retryCount + 1}/${MAX_RETRIES})...`);
+        // Wait progressively longer for each retry
+        await new Promise(resolve => setTimeout(resolve, RATE_LIMIT_INTERVAL * 2 * (retryCount + 1)));
+        return rateLimitedFetch(url, retryCount + 1);
+      }
+      
+      // For other errors or if we're out of retries, rethrow
+      throw error;
+    }
   };
 })();
 
