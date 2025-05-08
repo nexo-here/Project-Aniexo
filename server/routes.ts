@@ -397,6 +397,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { q, genre } = req.query;
       
+      // Allow search with just genre and no query
       if (!q && !genre) {
         return res.status(400).json({
           success: false,
@@ -414,7 +415,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
       
-      const data = await jikanApi.searchAnime(q as string | undefined, genre as string | undefined);
+      console.log(`Search request: query="${q}", genre="${genre}"`);
+      
+      const data = await jikanApi.searchAnime(
+        q ? q.toString() : undefined, 
+        genre ? genre.toString() : undefined
+      );
+      
       cache.set(cacheKey, data);
       
       res.json({

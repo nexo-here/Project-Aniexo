@@ -216,16 +216,9 @@ const Home = () => {
           <div className="relative">
             {loadingUpcoming ? (
               <div className="flex overflow-x-auto pb-6 -mx-4 px-4 space-x-4 custom-scrollbar">
-                {Array(5).fill(0).map((_, index) => (
-                  <div key={index} className="animate-pulse flex-none w-64 rounded-xl overflow-hidden shadow-md">
-                    <div className="bg-gray-300 dark:bg-gray-700 h-80 w-full"></div>
-                    <div className="p-4 bg-white dark:bg-neutral-medium">
-                      <div className="h-5 bg-gray-300 dark:bg-gray-700 rounded w-3/4 mb-3"></div>
-                      <div className="flex items-center">
-                        <div className="h-4 bg-gray-300 dark:bg-gray-700 rounded w-12 mr-3"></div>
-                        <div className="h-4 bg-gray-300 dark:bg-gray-700 rounded w-24"></div>
-                      </div>
-                    </div>
+                {[...Array(5)].map((_, index) => (
+                  <div key={`upcoming-skeleton-${index}`} className="flex-none w-64">
+                    <AnimeCardSkeleton size="small" />
                   </div>
                 ))}
               </div>
@@ -265,14 +258,8 @@ const Home = () => {
           
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-5">
             {loadingTrending ? (
-              Array(10).fill(0).map((_, index) => (
-                <div key={index} className="animate-pulse rounded-xl overflow-hidden shadow-md">
-                  <div className="bg-gray-300 dark:bg-gray-700 aspect-[2/3] w-full"></div>
-                  <div className="p-3 bg-white dark:bg-neutral-medium">
-                    <div className="h-4 bg-gray-300 dark:bg-gray-700 rounded w-3/4 mb-2"></div>
-                    <div className="h-3 bg-gray-300 dark:bg-gray-700 rounded w-12"></div>
-                  </div>
-                </div>
+              [...Array(10)].map((_, index) => (
+                <AnimeCardSkeleton key={`trending-skeleton-${index}`} />
               ))
             ) : trendingAnime && trendingAnime.length > 0 ? (
               trendingAnime.slice(0, 10).map((anime) => (
@@ -299,28 +286,8 @@ const Home = () => {
           
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {loadingUnderrated ? (
-              Array(4).fill(0).map((_, index) => (
-                <div key={index} className="animate-pulse flex bg-white dark:bg-neutral-medium rounded-xl overflow-hidden shadow-md">
-                  <div className="w-1/3 bg-gray-300 dark:bg-gray-700"></div>
-                  <div className="w-2/3 p-5">
-                    <div className="flex justify-between">
-                      <div className="h-5 bg-gray-300 dark:bg-gray-700 rounded w-1/2 mb-3"></div>
-                      <div className="h-6 bg-gray-300 dark:bg-gray-700 rounded w-12"></div>
-                    </div>
-                    <div className="flex space-x-2 mb-3">
-                      <div className="h-6 bg-gray-300 dark:bg-gray-700 rounded w-16"></div>
-                      <div className="h-6 bg-gray-300 dark:bg-gray-700 rounded w-16"></div>
-                      <div className="h-6 bg-gray-300 dark:bg-gray-700 rounded w-16"></div>
-                    </div>
-                    <div className="h-4 bg-gray-300 dark:bg-gray-700 rounded w-full mb-2"></div>
-                    <div className="h-4 bg-gray-300 dark:bg-gray-700 rounded w-11/12 mb-2"></div>
-                    <div className="h-4 bg-gray-300 dark:bg-gray-700 rounded w-10/12 mb-3"></div>
-                    <div className="flex">
-                      <div className="h-4 bg-gray-300 dark:bg-gray-700 rounded w-16 mr-3"></div>
-                      <div className="h-4 bg-gray-300 dark:bg-gray-700 rounded w-24"></div>
-                    </div>
-                  </div>
-                </div>
+              [...Array(4)].map((_, index) => (
+                <AnimeCardSkeleton key={`underrated-skeleton-${index}`} size="large" />
               ))
             ) : underratedAnime && underratedAnime.length > 0 ? (
               underratedAnime.slice(0, 4).map((anime) => (

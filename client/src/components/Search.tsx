@@ -4,6 +4,7 @@ import { Link } from "wouter";
 import { Input } from "@/components/ui/input";
 import { AnimeBasic } from "@shared/types";
 import GenreTag from "@/components/GenreTag";
+import AnimeCardSkeleton from "@/components/AnimeCardSkeleton";
 
 interface SearchProps {
   onClose: () => void;
